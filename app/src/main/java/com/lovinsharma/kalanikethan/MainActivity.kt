@@ -3,12 +3,12 @@ package com.lovinsharma.kalanikethan
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -29,17 +29,13 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavOptions
@@ -53,7 +49,6 @@ import com.lovinsharma.kalanikethan.screens.PaymentsScreen
 import com.lovinsharma.kalanikethan.screens.SignInScreen
 import com.lovinsharma.kalanikethan.screens.WhoInScreen
 import com.lovinsharma.kalanikethan.ui.theme.KalanikethanTheme
-import com.lovinsharma.kalanikethan.ui.theme.PrimaryLightColor
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,7 +76,9 @@ class MainActivity : ComponentActivity() {
                                 .width(200.dp)
                                 .fillMaxHeight(),
                             onScreenSelected = { screen ->
-                                navController.navigate(screen, navOptions = navOptions)
+                                if (navController.currentBackStackEntry?.destination?.route!=screen) {
+                                    navController.navigate(screen, navOptions = navOptions)
+                                }
                             }
                         )
                         Column(
@@ -90,7 +87,13 @@ class MainActivity : ComponentActivity() {
                                 .background(color = MaterialTheme.colorScheme.background),
                             verticalArrangement = Arrangement.Top,
                         ) {
-                            NavHost(navController = navController, startDestination = "Home") {
+                            NavHost(navController = navController, startDestination = "Home",
+                                // Disable transitions
+                                enterTransition = { EnterTransition.None },
+                                exitTransition = { ExitTransition.None },
+                                popEnterTransition = { EnterTransition.None },
+                                popExitTransition = { ExitTransition.None },
+                                ) {
                                 composable("Home") { HomeScreen(navController) }
                                 composable("SignIn") { SignInScreen(navController) }
                                 composable("AddScreen") { AddScreen(navController) }
@@ -99,15 +102,8 @@ class MainActivity : ComponentActivity() {
                                 composable("PaymentsScreen") { PaymentsScreen(navController) }
                             }
                         }
-
                     }
-
-
                 }
-
-
-
-
             }
         }
     }
@@ -160,7 +156,7 @@ fun Appbar(
             // If the system is in dark theme then we use the dark theme logo which is purple
             if (isSystemInDarkTheme()) {
                 Image(
-                    painter = painterResource(id = R.drawable.logo_dark), // Replace with your logo
+                    painter = painterResource(id = R.drawable.logo_dark_1_), // Replace with your logo
                     contentDescription = "App Logo",
                     modifier = Modifier.size(100.dp)
                 )
