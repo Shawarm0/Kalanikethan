@@ -42,7 +42,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.lovinsharma.kalanikethan.screens.AddScreen
+import com.lovinsharma.kalanikethan.screens.addscreen.AddScreen
 import com.lovinsharma.kalanikethan.screens.HistoryScreen
 import com.lovinsharma.kalanikethan.screens.HomeScreen
 import com.lovinsharma.kalanikethan.screens.PaymentsScreen
@@ -96,7 +96,7 @@ class MainActivity : ComponentActivity() {
                                 ) {
                                 composable("Home") { HomeScreen(navController) }
                                 composable("SignIn") { SignInScreen(navController) }
-                                composable("AddScreen") { AddScreen(navController) }
+                                composable("AddScreen") { AddScreen() }
                                 composable("WhoInScreen") { WhoInScreen(navController) }
                                 composable("History") { HistoryScreen(navController) }
                                 composable("PaymentsScreen") { PaymentsScreen(navController) }

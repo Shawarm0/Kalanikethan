@@ -25,6 +25,8 @@ data class Family(
         onDelete = ForeignKey.CASCADE
     )]
 )
+
+
 data class Student(
     @ColumnInfo(name = "student_id") @PrimaryKey(autoGenerate = true) val studentID: Int=0,
     @ColumnInfo(name = "student_name") var studentName: String,
@@ -35,6 +37,7 @@ data class Student(
     @ColumnInfo(name = "family_id") val familyIDfk: Int,
     @ColumnInfo(name = "payment_id") val paymentID: String,
 )
+
 
 // This is the event table
 @Entity(
