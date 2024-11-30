@@ -39,6 +39,7 @@ fun ParentsScreen() {
         ExtendedFloatingActionButton(
             onClick = {
                 // This will carry out an action every time the Add student button is pressed.
+
                 println("Add a new Parent")
             },
             icon = { Icon(Icons.Filled.Add, contentDescription = "Add Parent") },

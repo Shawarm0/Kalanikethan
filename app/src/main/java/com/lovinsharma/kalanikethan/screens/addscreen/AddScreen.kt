@@ -49,13 +49,27 @@ import androidx.navigation.compose.rememberNavController
 import com.lovinsharma.kalanikethan.R
 import com.lovinsharma.kalanikethan.composables.AddScreenButtons
 import com.lovinsharma.kalanikethan.composables.IconButtonWithText
+import com.lovinsharma.kalanikethan.data.room.models.Family
+import com.lovinsharma.kalanikethan.data.room.models.Parent
+import com.lovinsharma.kalanikethan.data.room.models.Student
 import java.util.Locale
 
 @Composable
 fun AddScreen() {
+
+    val students = mutableListOf<Student>()
+    val parents = mutableListOf<Parent>()
+    val family by remember { mutableStateOf(Family(
+        familyName = "",
+        paymentDate = 0L,
+        paymentID = "",
+    )) }
+
+
     var familyName by remember { mutableStateOf("") }
     var showAddButton by remember { mutableStateOf(false) }
     var addState by remember { mutableStateOf(true) }
+
 
     // This is to manage the moving of screens
     val navController = rememberNavController()
@@ -142,6 +156,7 @@ fun AddScreen() {
                             if (addState) {
                                 IconButtonWithText(
                                     onClick = {
+                                        family.familyName = familyName
                                         showAddButton = false
                                         addState = false
                                     },
@@ -161,6 +176,7 @@ fun AddScreen() {
                             } else {
                                 IconButtonWithText(
                                     onClick = {
+                                        family.familyName = familyName
                                         showAddButton = false
                                     },
                                     icon = {
@@ -224,7 +240,7 @@ fun AddScreen() {
             ) {
             composable("Students") { StudentsScreen() }
             composable("Parents") { ParentsScreen() }
-            composable("Payment ID") { PaymentIDScreen() }
+            composable("Payment ID") { PaymentIDScreen(family = family) }
         }
     }
 }

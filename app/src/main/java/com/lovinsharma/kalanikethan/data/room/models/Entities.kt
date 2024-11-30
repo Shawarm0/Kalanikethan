@@ -10,8 +10,9 @@ import androidx.room.PrimaryKey
 @Entity(tableName = "family_table")
 data class Family(
     @ColumnInfo(name = "family_id") @PrimaryKey(autoGenerate = true) val familyID: Int=0,
-    @ColumnInfo(name = "family_name") val familyName: String,
-    @ColumnInfo(name = "payment_date") val paymentDate: String,
+    @ColumnInfo(name = "family_name") var familyName: String,
+    @ColumnInfo(name = "payment_date") var paymentDate: Long,
+    @ColumnInfo(name = "payment_id") var paymentID: String,
 )
 
 
@@ -35,7 +36,6 @@ data class Student(
     @ColumnInfo(name = "can_walk_alone") var canWalkAlone: Boolean = false,
     @ColumnInfo(name = "signed_in") val signedIn: Boolean = false,
     @ColumnInfo(name = "family_id") val familyIDfk: Int,
-    @ColumnInfo(name = "payment_id") val paymentID: String,
 )
 
 
