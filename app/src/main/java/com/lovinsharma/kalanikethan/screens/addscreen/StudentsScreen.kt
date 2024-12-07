@@ -18,39 +18,52 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.lovinsharma.kalanikethan.composables.StudentBox
+import com.lovinsharma.kalanikethan.models.Student
 
 @Composable
-fun StudentsScreen() {
-
+fun StudentsScreen(students: MutableList<Student>, familyName: String) {
     // Creates a scrollable box
     Box(modifier = Modifier.fillMaxSize()) {
+        // Scrollable content
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // This is to display whatever I want in the add Student Screen
-            Text(
-                "This is the students Screen"
-            )
-
+            for (index in students.indices) {
+                StudentBox(student = students[index], students = students, onStudentChange = { updatedStudent ->
+                    students[index] = updatedStudent
+                })
+            }
         }
 
-            // Floating Action Button positioned at the bottom right
-            ExtendedFloatingActionButton(
-                onClick = {
-                    // This will carry out an action every time the Add student button is pressed.
-                    println("Add a new student")
-                },
-                icon = { Icon(Icons.Filled.Add, contentDescription = "Add Student") },
-                text = { Text(text = "Add Student") },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-            )
-
+        // Floating Action Button positioned at the bottom right
+        ExtendedFloatingActionButton(
+            onClick = {
+                if (familyName.isNotEmpty()) {
+                    students.add(
+                        Student(
+                            studentName = "",
+                            studentNumber = "",
+                            birthdate = "",
+                            additionalInfo = "",
+                            canWalkAlone = false,
+                            signedIn = false,
+                            familyIDfk = 0
+                        )
+                    )
+                } else {
+                    println("You must add a family Name first")
+                }
+            },
+            icon = { Icon(Icons.Filled.Add, contentDescription = "Add Student") },
+            text = { Text(text = "Add Student") },
+            containerColor = MaterialTheme.colorScheme.secondary,
+            contentColor = Color.White,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp) // Add padding only to the FAB, not the scrollable content
+        )
     }
 }

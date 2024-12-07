@@ -1,4 +1,4 @@
-package com.lovinsharma.kalanikethan.data.room.models
+package com.lovinsharma.kalanikethan.models
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -11,6 +11,7 @@ import androidx.room.PrimaryKey
 data class Family(
     @ColumnInfo(name = "family_id") @PrimaryKey(autoGenerate = true) val familyID: Int=0,
     @ColumnInfo(name = "family_name") var familyName: String,
+    @ColumnInfo(name = "family_email") var familyEmail: String,
     @ColumnInfo(name = "payment_date") var paymentDate: Long,
     @ColumnInfo(name = "payment_id") var paymentID: String,
 )
@@ -33,6 +34,7 @@ data class Student(
     @ColumnInfo(name = "student_name") var studentName: String,
     @ColumnInfo(name = "student_number") var studentNumber: String,
     @ColumnInfo(name = "student_dob") var birthdate: String,
+    @ColumnInfo(name = "additional_information") var additionalInfo: String,
     @ColumnInfo(name = "can_walk_alone") var canWalkAlone: Boolean = false,
     @ColumnInfo(name = "signed_in") val signedIn: Boolean = false,
     @ColumnInfo(name = "family_id") val familyIDfk: Int,
@@ -76,7 +78,6 @@ data class Parent(
     @PrimaryKey(autoGenerate = true) val parentID: Int = 0,
     @ColumnInfo(name = "parent_name") val parentName: String,
     @ColumnInfo(name = "parent_number") val parentNumber: String,
-    @ColumnInfo(name = "parent_email") val parentEmail: String,
     @ColumnInfo(name = "family_id") val familyIDfk: Int,
 )
 

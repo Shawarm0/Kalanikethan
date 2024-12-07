@@ -17,30 +17,45 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.lovinsharma.kalanikethan.composables.ParentsBox
+import com.lovinsharma.kalanikethan.models.Parent
 
 @Composable
-fun ParentsScreen() {
+fun ParentsScreen(parents: MutableList<Parent>, familyName: String) {
     // Creates a scrollable box
     Box(modifier = Modifier.fillMaxSize()) {
+        // Scrollable content
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(bottom = 80.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            // This is to display whatever I want in the add Student Screen
-            Text(
-                "This is the Parents Screen"
-            )
+            for (index in parents.indices) {
+                ParentsBox(
+                    parent = parents[index],
+                    onParentChange = {updatedParent ->
+                        parents[index] = updatedParent
+                    }
+                )
+            }
 
         }
 
         // Floating Action Button positioned at the bottom right
         ExtendedFloatingActionButton(
             onClick = {
-                // This will carry out an action every time the Add student button is pressed.
-
-                println("Add a new Parent")
+                if (familyName.isNotEmpty()) {
+                    // This will carry out an action every time the Add Parent button is pressed
+                    parents.add(
+                        Parent(
+                            parentName = "",
+                            parentNumber = "",
+                            familyIDfk = 0
+                        )
+                    )
+                } else {
+                    println("familyName cannot be empty")
+                }
             },
             icon = { Icon(Icons.Filled.Add, contentDescription = "Add Parent") },
             text = { Text(text = "Add Parent") },
@@ -48,8 +63,7 @@ fun ParentsScreen() {
             contentColor = Color.White,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(horizontal = 16.dp, vertical = 16.dp)
+                .padding(16.dp) // Padding applied only to FAB
         )
-
     }
 }

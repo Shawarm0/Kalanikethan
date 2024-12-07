@@ -15,10 +15,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Face
@@ -28,6 +26,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -49,26 +48,33 @@ import androidx.navigation.compose.rememberNavController
 import com.lovinsharma.kalanikethan.R
 import com.lovinsharma.kalanikethan.composables.AddScreenButtons
 import com.lovinsharma.kalanikethan.composables.IconButtonWithText
-import com.lovinsharma.kalanikethan.data.room.models.Family
-import com.lovinsharma.kalanikethan.data.room.models.Parent
-import com.lovinsharma.kalanikethan.data.room.models.Student
+import com.lovinsharma.kalanikethan.models.Family
+import com.lovinsharma.kalanikethan.models.Parent
+import com.lovinsharma.kalanikethan.models.Student
 import java.util.Locale
 
 @Composable
 fun AddScreen() {
+    // This is a list of students we will add to every time the add button is pressed on the students screen.
+    val students = remember { mutableStateListOf<Student>() }
 
-    val students = mutableListOf<Student>()
-    val parents = mutableListOf<Parent>()
-    val family by remember { mutableStateOf(Family(
+    val parents =  remember { mutableStateListOf<Parent>() }
+
+
+    // Everything to do with the family
+    val family by remember { mutableStateOf(
+        Family(
         familyName = "",
+        familyEmail = "",
         paymentDate = 0L,
         paymentID = "",
-    )) }
+    )
+    ) }
+    val familyName = remember { mutableStateOf("") }
 
 
-    var familyName by remember { mutableStateOf("") }
     var showAddButton by remember { mutableStateOf(false) }
-    var addState by remember { mutableStateOf(true) }
+    var addState = remember { mutableStateOf(true) }
 
 
     // This is to manage the moving of screens
@@ -110,16 +116,16 @@ fun AddScreen() {
                     ) {
 
                         BasicTextField(
-                            value = familyName,
+                            value = familyName.value,
                             onValueChange = { input ->
-                                familyName = input.split(" ")
+                                familyName.value = input.split(" ")
                                     .joinToString(" ") { it.replaceFirstChar {
                                         if (it.isLowerCase()) it.titlecase(
                                             Locale.ROOT
                                         ) else it.toString()
                                     } }
                                 showAddButton =
-                                    familyName.isNotBlank() // Show button if there's input
+                                    familyName.value.isNotBlank() // Show button if there's input
                             },
                             textStyle = TextStyle(
                                 color = Color.White,
@@ -137,7 +143,7 @@ fun AddScreen() {
                             ),
                         ) {
                             innerTextField ->
-                            if (familyName.isEmpty()) {
+                            if (familyName.value.isEmpty()) {
                                 Text(
                                     text = "Enter Family Name",
                                     style = TextStyle(
@@ -153,12 +159,12 @@ fun AddScreen() {
 
 
                         if (showAddButton) {
-                            if (addState) {
+                            if (addState.value) {
                                 IconButtonWithText(
+                                    modifier = Modifier.padding(10.dp),
                                     onClick = {
-                                        family.familyName = familyName
                                         showAddButton = false
-                                        addState = false
+                                        addState.value = false
                                     },
                                     icon = {
                                         Icon(
@@ -176,7 +182,6 @@ fun AddScreen() {
                             } else {
                                 IconButtonWithText(
                                     onClick = {
-                                        family.familyName = familyName
                                         showAddButton = false
                                     },
                                     icon = {
@@ -238,9 +243,9 @@ fun AddScreen() {
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
             ) {
-            composable("Students") { StudentsScreen() }
-            composable("Parents") { ParentsScreen() }
-            composable("Payment ID") { PaymentIDScreen(family = family) }
+            composable("Students") { StudentsScreen(students = students, familyName = familyName.value) }
+            composable("Parents") { ParentsScreen(parents = parents, familyName = familyName.value) }
+            composable("Payment ID") { PaymentIDScreen(family = family, familyName, parents = parents, students = students, addState = addState ) }
         }
     }
 }
