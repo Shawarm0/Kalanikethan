@@ -43,9 +43,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.lovinsharma.kalanikethan.composables.DatePickerModal
-import com.lovinsharma.kalanikethan.models.Family
+import com.lovinsharma.kalanikethan.models.FamilyUI
 import com.lovinsharma.kalanikethan.models.Parent
+import com.lovinsharma.kalanikethan.models.ParentUI
 import com.lovinsharma.kalanikethan.models.Student
+import com.lovinsharma.kalanikethan.models.StudentUI
+import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -55,7 +58,7 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun PaymentIDScreen(family: Family, familyName: MutableState<String>, parents: MutableList<Parent>, students: MutableList<Student>, addState: MutableState<Boolean>) {
+fun PaymentIDScreen(family: FamilyUI, familyName: MutableState<String>, parents: MutableList<ParentUI>, students: MutableList<StudentUI>, addState: MutableState<Boolean>, viewModel: MainViewModel) {
     var paymentID by remember { mutableStateOf("") }
     var paymentDate by remember { mutableStateOf("") }
     var paymentEmail by remember { mutableStateOf("") }
@@ -159,21 +162,29 @@ fun PaymentIDScreen(family: Family, familyName: MutableState<String>, parents: M
 
         Button(
             onClick = {
-                family.paymentID = paymentID
-                family.paymentDate = if (paymentDate == "") 0L else convertDateToLong(paymentDate)
-                family.familyEmail = paymentEmail
-                family.familyName = familyName.value
+                // Create the FamilyUI object with data from UI
+                val family1 = FamilyUI(
+                    familyName = familyName.value,
+                    familyEmail = paymentEmail,
+                    paymentDate = if (paymentDate == "") 0L else convertDateToLong(paymentDate),
+                    paymentID = paymentID
+                )
 
+
+                // Call the ViewModel method to save the family
+                viewModel.onAddFamilyButtonPressed(
+                    family1,
+                    familyName,
+                    parents,
+                    students,
+                    addState
+                )
 
                 // This clears all of the data :)
                 paymentEmail = ""
                 paymentID = ""
                 paymentDate = ""
-                familyName.value = ""
-                parents.clear()
-                students.clear()
                 showfloatingdiaglog = true
-                addState.value = true
             },
             modifier = Modifier.padding(20.dp),
             shape = MaterialTheme.shapes.medium,
@@ -238,4 +249,6 @@ fun FamilyAddedDialog(onDismissRequest: () -> Unit) {
             )
         }
     }
+
 }
+

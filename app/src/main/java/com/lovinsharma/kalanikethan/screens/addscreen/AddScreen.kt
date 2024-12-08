@@ -41,6 +41,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -48,27 +49,28 @@ import androidx.navigation.compose.rememberNavController
 import com.lovinsharma.kalanikethan.R
 import com.lovinsharma.kalanikethan.composables.AddScreenButtons
 import com.lovinsharma.kalanikethan.composables.IconButtonWithText
-import com.lovinsharma.kalanikethan.models.Family
-import com.lovinsharma.kalanikethan.models.Parent
-import com.lovinsharma.kalanikethan.models.Student
+import com.lovinsharma.kalanikethan.models.FamilyUI
+import com.lovinsharma.kalanikethan.models.ParentUI
+import com.lovinsharma.kalanikethan.models.StudentUI
+import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 import java.util.Locale
 
 @Composable
 fun AddScreen() {
     // This is a list of students we will add to every time the add button is pressed on the students screen.
-    val students = remember { mutableStateListOf<Student>() }
+    val students = remember { mutableStateListOf<StudentUI>() }
 
-    val parents =  remember { mutableStateListOf<Parent>() }
-
+    val parents =  remember { mutableStateListOf<ParentUI>() }
+    val viewModel: MainViewModel = viewModel()
 
     // Everything to do with the family
     val family by remember { mutableStateOf(
-        Family(
-        familyName = "",
-        familyEmail = "",
-        paymentDate = 0L,
-        paymentID = "",
-    )
+        FamilyUI(
+            familyName = "",
+            familyEmail = "",
+            paymentDate = 0L,
+            paymentID = ""
+        )
     ) }
     val familyName = remember { mutableStateOf("") }
 
@@ -245,7 +247,7 @@ fun AddScreen() {
             ) {
             composable("Students") { StudentsScreen(students = students, familyName = familyName.value) }
             composable("Parents") { ParentsScreen(parents = parents, familyName = familyName.value) }
-            composable("Payment ID") { PaymentIDScreen(family = family, familyName, parents = parents, students = students, addState = addState ) }
+            composable("Payment ID") { PaymentIDScreen(family = family, familyName, parents = parents, students = students, addState = addState, viewModel = viewModel) }
         }
     }
 }

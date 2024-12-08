@@ -20,9 +20,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.lovinsharma.kalanikethan.composables.StudentBox
 import com.lovinsharma.kalanikethan.models.Student
+import com.lovinsharma.kalanikethan.models.StudentUI
 
 @Composable
-fun StudentsScreen(students: MutableList<Student>, familyName: String) {
+fun StudentsScreen(students: MutableList<StudentUI>, familyName: String) {
     // Creates a scrollable box
     Box(modifier = Modifier.fillMaxSize()) {
         // Scrollable content
@@ -43,14 +44,12 @@ fun StudentsScreen(students: MutableList<Student>, familyName: String) {
             onClick = {
                 if (familyName.isNotEmpty()) {
                     students.add(
-                        Student(
+                        StudentUI(
                             studentName = "",
                             studentNumber = "",
-                            birthdate = "",
                             additionalInfo = "",
                             canWalkAlone = false,
-                            signedIn = false,
-                            familyIDfk = 0
+                            birthdate = ""
                         )
                     )
                 } else {

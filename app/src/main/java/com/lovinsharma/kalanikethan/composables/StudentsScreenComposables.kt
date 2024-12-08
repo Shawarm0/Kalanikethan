@@ -45,6 +45,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lovinsharma.kalanikethan.models.Student
+import com.lovinsharma.kalanikethan.models.StudentUI
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -52,9 +53,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StudentBox(
-    student: Student,
-    students: MutableList<Student>,
-    onStudentChange: (Student) -> Unit
+    student: StudentUI,
+    students: MutableList<StudentUI>,
+    onStudentChange: (StudentUI) -> Unit
 ) {
     var studentName by remember { mutableStateOf(student.studentName) }
     var studentNumber by remember { mutableStateOf(student.studentNumber) }
@@ -68,13 +69,12 @@ fun StudentBox(
     // Update the Student object when any of its fields change
     LaunchedEffect(studentName, studentNumber, additionalInfo, canWalkAlone, studentDOB) {
         onStudentChange(
-            Student(
+            StudentUI(
                 studentName = studentName,
                 studentNumber = studentNumber,
                 additionalInfo = additionalInfo,
                 canWalkAlone = canWalkAlone,
-                birthdate = studentDOB,
-                familyIDfk = 0,
+                birthdate = studentDOB
             )
         )
     }
@@ -327,7 +327,7 @@ fun StudentBox(
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     OutlinedTextField(
-                        value = additionalInfo,
+                        value = additionalInfo?: "",
                         onValueChange = { additionalInfo = it },
                         label = { Text("Additional Info") },
                         modifier = Modifier.fillMaxWidth(),

@@ -18,10 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.lovinsharma.kalanikethan.composables.ParentsBox
-import com.lovinsharma.kalanikethan.models.Parent
+import com.lovinsharma.kalanikethan.models.ParentUI
 
 @Composable
-fun ParentsScreen(parents: MutableList<Parent>, familyName: String) {
+fun ParentsScreen(parents: MutableList<ParentUI>, familyName: String) {
     // Creates a scrollable box
     Box(modifier = Modifier.fillMaxSize()) {
         // Scrollable content
@@ -33,7 +33,7 @@ fun ParentsScreen(parents: MutableList<Parent>, familyName: String) {
             for (index in parents.indices) {
                 ParentsBox(
                     parent = parents[index],
-                    onParentChange = {updatedParent ->
+                    onParentChange = { updatedParent ->
                         parents[index] = updatedParent
                     }
                 )
@@ -47,10 +47,9 @@ fun ParentsScreen(parents: MutableList<Parent>, familyName: String) {
                 if (familyName.isNotEmpty()) {
                     // This will carry out an action every time the Add Parent button is pressed
                     parents.add(
-                        Parent(
+                        ParentUI(
                             parentName = "",
                             parentNumber = "",
-                            familyIDfk = 0
                         )
                     )
                 } else {

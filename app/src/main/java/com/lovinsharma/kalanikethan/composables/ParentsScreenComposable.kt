@@ -31,13 +31,14 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.lovinsharma.kalanikethan.models.Parent
+import com.lovinsharma.kalanikethan.models.ParentUI
 import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ParentsBox(
-    parent: Parent,
-    onParentChange: (Parent) -> Unit
+    parent: ParentUI,
+    onParentChange: (ParentUI) -> Unit
 ) {
     var parentName by remember { mutableStateOf(parent.parentName) }
     var parentNumber by remember { mutableStateOf(parent.parentNumber) }
@@ -45,10 +46,9 @@ fun ParentsBox(
     // Update the Student object when any of its fields change
     LaunchedEffect(parentName, parentNumber) {
         onParentChange(
-            Parent(
+            ParentUI(
                 parentName = parentName,
                 parentNumber = parentNumber,
-                familyIDfk = 0
             )
         )
     }
