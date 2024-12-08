@@ -81,3 +81,50 @@ data class Parent(
     @ColumnInfo(name = "family_id") val familyIDfk: Int,
 )
 
+
+
+
+
+
+//class Family: RealmObject {
+//    @PrimaryKey var _id: ObjectId = ObjectId()
+//    var familyName: String = ""
+//    var familyEmail: String? = null
+//    var students: RealmList<Student> = realmListOf()
+//    var parents: RealmList<Parent> = realmListOf()
+//    var paymentDate: Long = 0L // Next payment deadline
+//    var paymentHistory: RealmList<Payment> = realmListOf() // Historical payments
+//    var paymentID: String = ""
+//}
+//
+//class Student: RealmObject {
+//    @PrimaryKey var _id: ObjectId = ObjectId()
+//    var studentName: String = ""
+//    var studentNumber: String = ""
+//    var birthdate: String = ""
+//    var additionalInfo: String = ""
+//    var canWalkAlone: Boolean = false
+//    var signedIn: Boolean = false
+//}
+//
+//class Parent: RealmObject {
+//    @PrimaryKey var _id: ObjectId = ObjectId()
+//    val parentName: String = ""
+//    val parentNumber: String = ""
+//}
+//
+//class SignInEvent: EmbeddedRealmObject {
+//    var day: String = ""
+//    var student: Student? = null
+//    var signIn: Long = 0L
+//    var signOut: Long = 0L
+//}
+//
+//class Payment: RealmObject {
+//    @PrimaryKey var _id: ObjectId = ObjectId()
+//    var paymentDate: Long = 0L // Date of this specific payment
+//    var amountPaid: Double = 0.0 // Amount of payment made
+//}
+
+
+
