@@ -12,6 +12,7 @@ import com.lovinsharma.kalanikethan.models.Parent
 import com.lovinsharma.kalanikethan.models.ParentUI
 import com.lovinsharma.kalanikethan.models.Student
 import com.lovinsharma.kalanikethan.models.StudentUI
+import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -73,7 +74,12 @@ class MainViewModel: ViewModel() {
 
 
 
-
+    // Fetch all students from the database
+    fun getStudents(): List<Student> {
+        // Query all Student objects in the Realm database
+        val students = realm.query<Student>().find()
+        return students.toList() // Convert to immutable list
+    }
 
     // You can call this function in your UI when the button is pressed
     fun onAddFamilyButtonPressed(
