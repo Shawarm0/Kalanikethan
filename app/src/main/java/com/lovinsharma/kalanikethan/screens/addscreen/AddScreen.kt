@@ -60,17 +60,19 @@ fun AddScreen(viewModel: MainViewModel) {
     // This is a list of students we will add to every time the add button is pressed on the students screen.
     val students = remember { mutableStateListOf<StudentUI>() }
 
-    val parents =  remember { mutableStateListOf<ParentUI>() }
+    val parents = remember { mutableStateListOf<ParentUI>() }
 
     // Everything to do with the family
-    val family by remember { mutableStateOf(
-        FamilyUI(
-            familyName = "",
-            familyEmail = "",
-            paymentDate = 0L,
-            paymentID = ""
+    val family by remember {
+        mutableStateOf(
+            FamilyUI(
+                familyName = "",
+                familyEmail = "",
+                paymentDate = 0L,
+                paymentID = ""
+            )
         )
-    ) }
+    }
     val familyName = remember { mutableStateOf("") }
 
 
@@ -109,144 +111,167 @@ fun AddScreen(viewModel: MainViewModel) {
                     modifier = Modifier
                         .weight(1f)
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
+                    Text(
+                        text = "This is something"
+                    )
 
-                        BasicTextField(
-                            value = familyName.value,
-                            onValueChange = { input ->
-                                familyName.value = input.split(" ")
-                                    .joinToString(" ") { it.replaceFirstChar {
-                                        if (it.isLowerCase()) it.titlecase(
-                                            Locale.ROOT
-                                        ) else it.toString()
-                                    } }
-                                showAddButton =
-                                    familyName.value.isNotBlank() // Show button if there's input
-                            },
-                            textStyle = TextStyle(
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start
-                            ),
-                            modifier = Modifier
-                                .weight(1f), // Ensures text field takes up as much width as possible
-                            singleLine = true,
-                            cursorBrush = SolidColor(Color.White),
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                keyboardType = KeyboardType.Text,
-                                capitalization = KeyboardCapitalization.Words // Capitalize first letter of each word
-                            ),
-                        ) {
-                            innerTextField ->
-                            if (familyName.value.isEmpty()) {
-                                Text(
-                                    text = "Enter Family Name",
-                                    style = TextStyle(
-                                        color = Color.White,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Start
-                                    )
-                                )
-                            }
-                            innerTextField()
-                        }
-
-
-                        if (showAddButton) {
-                            if (addState.value) {
-                                IconButtonWithText(
-                                    modifier = Modifier.padding(10.dp),
-                                    onClick = {
-                                        showAddButton = false
-                                        addState.value = false
-                                    },
-                                    icon = {
-                                        Icon(
-                                            imageVector = Icons.Default.Face,
-                                            contentDescription = "Add Family",
-                                            tint = Color.White
-                                        )
-                                    },
-                                    text = "Add Family",
-                                    buttonColors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                                        contentColor = Color.White
-                                    )
-                                )
-                            } else {
-                                IconButtonWithText(
-                                    onClick = {
-                                        showAddButton = false
-                                    },
-                                    icon = {
-                                        Icon(
-                                            imageVector =  Icons.Default.Edit,
-                                            contentDescription = "Edit Family",
-                                            tint = Color.White
-                                        )
-                                    },
-                                    text = "Edit Family",
-                                    buttonColors = ButtonDefaults.buttonColors(
-                                        containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                                       contentColor = Color.White
-                                    )
-                                )
-                            }
-
-
-                        }
-
-
-                    }
                 }
-
-
-
-                // These are the buttons at the top
-                Row(
-                    horizontalArrangement = Arrangement.End,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AddScreenButtons(iconResId = R.drawable.student,
-                        text = "Students",
-                        isSelected = currentDestination == "Students",
-                        onClick = { navController.navigate("Students") })
-
-                    Spacer(modifier = Modifier.width(8.dp)) // Space between buttons
-                    AddScreenButtons(iconResId = R.drawable.parents,
-                        text = "Parents",
-                        isSelected = currentDestination == "Parents",
-                        onClick = { navController.navigate("Parents") })
-
-                    Spacer(modifier = Modifier.width(8.dp)) // Space between buttons
-                    AddScreenButtons(iconResId = R.drawable.payid,
-                        text = "Payment ID",
-                        isSelected = currentDestination == "Payment ID",
-                        onClick = { navController.navigate("Payment ID") })
-                }
-
-
             }
+
+
+            // These are the buttons at the top
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AddScreenButtons(iconResId = R.drawable.student,
+                    text = "Students",
+                    isSelected = currentDestination == "Students",
+                    onClick = { navController.navigate("Students") })
+
+                Spacer(modifier = Modifier.width(8.dp)) // Space between buttons
+                AddScreenButtons(iconResId = R.drawable.parents,
+                    text = "Parents",
+                    isSelected = currentDestination == "Parents",
+                    onClick = { navController.navigate("Parents") })
+
+                Spacer(modifier = Modifier.width(8.dp)) // Space between buttons
+                AddScreenButtons(iconResId = R.drawable.payid,
+                    text = "Payment ID",
+                    isSelected = currentDestination == "Payment ID",
+                    onClick = { navController.navigate("Payment ID") })
+            }
+
+
+        }
+    }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        BasicTextField(
+            value = familyName.value,
+            onValueChange = { input ->
+                familyName.value = input.split(" ")
+                    .joinToString(" ") {
+                        it.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(
+                                Locale.ROOT
+                            ) else it.toString()
+                        }
+                    }
+                showAddButton =
+                    familyName.value.isNotBlank() // Show button if there's input
+            },
+            textStyle = TextStyle(
+                color = Color.White,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Start
+            ),
+            modifier = Modifier
+                .weight(1f), // Ensures text field takes up as much width as possible
+            singleLine = true,
+            cursorBrush = SolidColor(Color.White),
+            keyboardOptions = KeyboardOptions.Default.copy(
+                keyboardType = KeyboardType.Text,
+                capitalization = KeyboardCapitalization.Words // Capitalize first letter of each word
+            ),
+        ) { innerTextField ->
+            if (familyName.value.isEmpty()) {
+                Text(
+                    text = "Enter Family Name",
+                    style = TextStyle(
+                        color = Color.White,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Start
+                    )
+                )
+            }
+            innerTextField()
+        }
+
+
+        if (showAddButton) {
+            if (addState.value) {
+                IconButtonWithText(
+                    modifier = Modifier.padding(10.dp),
+                    onClick = {
+                        showAddButton = false
+                        addState.value = false
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Face,
+                            contentDescription = "Add Family",
+                            tint = Color.White
+                        )
+                    },
+                    text = "Add Family",
+                    buttonColors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White
+                    )
+                )
+            } else {
+                IconButtonWithText(
+                    onClick = {
+                        showAddButton = false
+                    },
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = "Edit Family",
+                            tint = Color.White
+                        )
+                    },
+                    text = "Edit Family",
+                    buttonColors = ButtonDefaults.buttonColors(
+                        containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White
+                    )
+                )
+            }
+
+
         }
 
         // Method of managing screens
-        NavHost(navController = navController, startDestination = "Students",
+        NavHost(
+            navController = navController, startDestination = "Students",
             // Disable transitions
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
             popExitTransition = { ExitTransition.None },
-            ) {
-            composable("Students") { StudentsScreen(students = students, familyName = familyName.value) }
-            composable("Parents") { ParentsScreen(parents = parents, familyName = familyName.value) }
-            composable("Payment ID") { PaymentIDScreen(family = family, familyName, parents = parents, students = students, addState = addState, viewModel = viewModel) }
+        ) {
+            composable("Students") {
+                StudentsScreen(
+                    students = students,
+                    familyName = familyName.value
+                )
+            }
+            composable("Parents") {
+                ParentsScreen(
+                    parents = parents,
+                    familyName = familyName.value
+                )
+            }
+            composable("Payment ID") {
+                PaymentIDScreen(
+                    family = family,
+                    familyName,
+                    parents = parents,
+                    students = students,
+                    addState = addState,
+                    viewModel = viewModel
+                )
+            }
         }
     }
 }

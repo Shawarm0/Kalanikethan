@@ -22,6 +22,7 @@ import androidx.lifecycle.liveData
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import org.mongodb.kbson.ObjectId
 
 class MainViewModel: ViewModel() {
 
@@ -140,6 +141,10 @@ class MainViewModel: ViewModel() {
             }
             fetchSignedStudents() // Refresh the list after sign-out
         }
+    }
+
+    fun getFamilyById(id: ObjectId): Family? {
+        return realm.query<Family>("_id == $0", id).first().find()
     }
 
 

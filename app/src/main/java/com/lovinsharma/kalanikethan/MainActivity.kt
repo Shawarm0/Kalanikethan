@@ -50,7 +50,6 @@ import com.lovinsharma.kalanikethan.screens.homescreen.HomeScreen
 import com.lovinsharma.kalanikethan.screens.PaymentsScreen
 import com.lovinsharma.kalanikethan.screens.SignInScreen
 import com.lovinsharma.kalanikethan.screens.WhoInScreen
-import com.lovinsharma.kalanikethan.screens.homescreen.UpdateScreen
 import com.lovinsharma.kalanikethan.ui.theme.KalanikethanTheme
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 
@@ -103,17 +102,12 @@ class MainActivity : ComponentActivity() {
                                 popEnterTransition = { EnterTransition.None },
                                 popExitTransition = { ExitTransition.None },
                                 ) {
-                                composable("Home") { HomeScreen(viewModel, onEdit = { familyincoming ->
-                                    family = familyincoming
-
-                                    navController.navigate("UpdateScreen")}) }
+                                composable("Home") { HomeScreen(viewModel) }
                                 composable("SignIn") { SignInScreen(viewModel) }
                                 composable("AddScreen") { AddScreen(viewModel) }
                                 composable("WhoInScreen") { WhoInScreen(navController) }
                                 composable("History") { HistoryScreen(navController) }
-                                composable("PaymentsScreen") { PaymentsScreen(navController) }
-                                composable("UpdateScreen") { UpdateScreen(viewModel, family) }
-                            }
+                                composable("PaymentsScreen") { PaymentsScreen(navController) } }
                         }
                     }
                 }

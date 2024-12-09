@@ -59,9 +59,9 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentIDScreen(family: FamilyUI, familyName: MutableState<String>, parents: MutableList<ParentUI>, students: MutableList<StudentUI>, addState: MutableState<Boolean>, viewModel: MainViewModel) {
-    var paymentID by remember { mutableStateOf("") }
-    var paymentDate by remember { mutableStateOf("") }
-    var paymentEmail by remember { mutableStateOf("") }
+    var paymentID by remember { mutableStateOf(family.paymentID) }
+    var paymentDate by remember { mutableStateOf(if (family.paymentDate == 0L) "" else SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(family.paymentDate))) }
+    var paymentEmail by remember { mutableStateOf(family.familyEmail) }
     var showDatePicker by remember { mutableStateOf(false) } // State to control dialog visibility
     var showfloatingdiaglog by remember { mutableStateOf(false) }
 

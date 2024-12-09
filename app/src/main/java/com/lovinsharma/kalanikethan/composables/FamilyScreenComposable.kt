@@ -5,6 +5,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -16,19 +18,17 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.lovinsharma.kalanikethan.models.Family
-import com.google.accompanist.flowlayout.FlowRow
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun FamilyBox(family: Family, onEdit: () -> Unit) {
+fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
     val students = family.students
     val parents = family.parents
 
@@ -131,7 +131,7 @@ fun FamilyBox(family: Family, onEdit: () -> Unit) {
 
                 // Edit Button at the bottom
                 Button(
-                    onClick = { onEdit() },
+                    onClick = { onEdit(family) },
                     modifier = Modifier
                         .padding(top = 10.dp)
                         .width(300.dp)
