@@ -15,11 +15,25 @@ import com.lovinsharma.kalanikethan.models.StudentUI
 import io.realm.kotlin.ext.query
 import io.realm.kotlin.ext.realmListOf
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import androidx.lifecycle.liveData
+import io.realm.kotlin.ext.query
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 
 class MainViewModel: ViewModel() {
 
     private val realm = Database.realm
+
+    // To observe changes in the students that aren't signed in
+    private val _unsignedStudents = MutableStateFlow<List<Student>>(emptyList())
+    val unsignedStudents: StateFlow<List<Student>> get() = _unsignedStudents
+
+
+    private val _signedStudents = MutableStateFlow<List<Student>>(emptyList())
+    val signedStudents: StateFlow<List<Student>> get() = _signedStudents
 
 
     private fun createFamily(
@@ -74,12 +88,61 @@ class MainViewModel: ViewModel() {
 
 
 
-    // Fetch all students from the database
-    fun getStudents(): List<Student> {
-        // Query all Student objects in the Realm database
-        val students = realm.query<Student>().find()
-        return students.toList() // Convert to immutable list
+
+    // Fetches all families along with related students, parents, and payments as a Flow
+    fun getAllFamilies(): Flow<List<Family>> = flow {
+        // Query to fetch all families (includes students, parents, and payments)
+        val families = realm.query<Family>().find()
+
+        // Emit the result to observers
+        emit(families)
     }
+
+
+    init {
+        fetchUnsignedStudents()
+        fetchSignedStudents() // Also fetch signed-in students
+    }
+
+    // Fetch all unsigned students and update the StateFlow
+    private fun fetchUnsignedStudents() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val students = realm.query<Student>("signedIn == false").find()
+            _unsignedStudents.value = students.toList() // Update the state
+        }
+    }
+
+    // Fetch all signed-in students and update the StateFlow
+    private fun fetchSignedStudents() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val students = realm.query<Student>("signedIn == true").find()
+            _signedStudents.value = students.toList() // Update the state
+        }
+    }
+
+
+    // Sign the student in
+    fun signIn(student: Student) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                val studentToUpdate = findLatest(student)
+                studentToUpdate?.signedIn = true
+            }
+            fetchUnsignedStudents() // Refresh the list after sign-in
+        }
+    }
+    // Sign the student out
+    fun signOut(student: Student) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                val studentToUpdate = findLatest(student)
+                studentToUpdate?.signedIn = false
+            }
+            fetchSignedStudents() // Refresh the list after sign-out
+        }
+    }
+
+
 
     // You can call this function in your UI when the button is pressed
     fun onAddFamilyButtonPressed(

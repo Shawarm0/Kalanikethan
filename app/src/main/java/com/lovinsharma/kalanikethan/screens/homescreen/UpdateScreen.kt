@@ -1,4 +1,4 @@
-package com.lovinsharma.kalanikethan.screens.addscreen
+package com.lovinsharma.kalanikethan.screens.homescreen
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
@@ -41,7 +41,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
@@ -49,29 +48,60 @@ import androidx.navigation.compose.rememberNavController
 import com.lovinsharma.kalanikethan.R
 import com.lovinsharma.kalanikethan.composables.AddScreenButtons
 import com.lovinsharma.kalanikethan.composables.IconButtonWithText
+import com.lovinsharma.kalanikethan.models.Family
 import com.lovinsharma.kalanikethan.models.FamilyUI
 import com.lovinsharma.kalanikethan.models.ParentUI
 import com.lovinsharma.kalanikethan.models.StudentUI
+import com.lovinsharma.kalanikethan.screens.addscreen.ParentsScreen
+import com.lovinsharma.kalanikethan.screens.addscreen.PaymentIDScreen
+import com.lovinsharma.kalanikethan.screens.addscreen.StudentsScreen
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 import java.util.Locale
 
-@Composable
-fun AddScreen(viewModel: MainViewModel) {
-    // This is a list of students we will add to every time the add button is pressed on the students screen.
-    val students = remember { mutableStateListOf<StudentUI>() }
 
-    val parents =  remember { mutableStateListOf<ParentUI>() }
+@Composable
+fun UpdateScreen(viewModel: MainViewModel, family: Family) {
+    // This is a list of students we will add to every time the add button is pressed on the students screen.
+    val studentSet = mutableSetOf<StudentUI>()
+    val parentSet = mutableSetOf<ParentUI>()
+
+    family.students.forEach { student ->
+        studentSet.add(
+            StudentUI(
+                studentName = student.studentName,
+                studentNumber = student.studentNumber,
+                birthdate = student.birthdate,
+                additionalInfo = student.additionalInfo ?: "",
+                canWalkAlone = student.canWalkAlone,
+            )
+        )
+    }
+
+    family.parents.forEach { parent ->
+        parentSet.add(
+            ParentUI(
+                parentName = parent.parentName,
+                parentNumber = parent.parentNumber
+            )
+        )
+    }
+
+// Convert sets back to lists if needed
+    val students = studentSet.toMutableList()
+    val parents = parentSet.toMutableList()
 
     // Everything to do with the family
     val family by remember { mutableStateOf(
-        FamilyUI(
-            familyName = "",
-            familyEmail = "",
-            paymentDate = 0L,
-            paymentID = ""
-        )
+        family.familyEmail?.let {
+            FamilyUI(
+                familyName = family.familyName,
+                familyEmail = it,
+                paymentDate = family.paymentDate,
+                paymentID = family.paymentID
+            )
+        }
     ) }
-    val familyName = remember { mutableStateOf("") }
+    val familyName = remember { family?.let { mutableStateOf(it.familyName) } }
 
 
     var showAddButton by remember { mutableStateOf(false) }
@@ -116,46 +146,49 @@ fun AddScreen(viewModel: MainViewModel) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
 
-                        BasicTextField(
-                            value = familyName.value,
-                            onValueChange = { input ->
-                                familyName.value = input.split(" ")
-                                    .joinToString(" ") { it.replaceFirstChar {
-                                        if (it.isLowerCase()) it.titlecase(
-                                            Locale.ROOT
-                                        ) else it.toString()
-                                    } }
-                                showAddButton =
-                                    familyName.value.isNotBlank() // Show button if there's input
-                            },
-                            textStyle = TextStyle(
-                                color = Color.White,
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Start
-                            ),
-                            modifier = Modifier
-                                .weight(1f), // Ensures text field takes up as much width as possible
-                            singleLine = true,
-                            cursorBrush = SolidColor(Color.White),
-                            keyboardOptions = KeyboardOptions.Default.copy(
-                                keyboardType = KeyboardType.Text,
-                                capitalization = KeyboardCapitalization.Words // Capitalize first letter of each word
-                            ),
-                        ) {
-                            innerTextField ->
-                            if (familyName.value.isEmpty()) {
-                                Text(
-                                    text = "Enter Family Name",
-                                    style = TextStyle(
-                                        color = Color.White,
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        textAlign = TextAlign.Start
+                        if (familyName != null) {
+                            BasicTextField(
+                                value = familyName.value,
+                                onValueChange = { input ->
+                                    familyName.value = input.split(" ")
+                                        .joinToString(" ") { it.replaceFirstChar {
+                                            if (it.isLowerCase()) it.titlecase(
+                                                Locale.ROOT
+                                            ) else it.toString()
+                                        } }
+                                    if (familyName != null) {
+                                        showAddButton =
+                                            familyName.value.isNotBlank()
+                                    } // Show button if there's input
+                                },
+                                textStyle = TextStyle(
+                                    color = Color.White,
+                                    fontSize = 20.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    textAlign = TextAlign.Start
+                                ),
+                                modifier = Modifier
+                                    .weight(1f), // Ensures text field takes up as much width as possible
+                                singleLine = true,
+                                cursorBrush = SolidColor(Color.White),
+                                keyboardOptions = KeyboardOptions.Default.copy(
+                                    keyboardType = KeyboardType.Text,
+                                    capitalization = KeyboardCapitalization.Words // Capitalize first letter of each word
+                                ),
+                            ) { innerTextField ->
+                                if (familyName.value.isEmpty()) {
+                                    Text(
+                                        text = "Enter Family Name",
+                                        style = TextStyle(
+                                            color = Color.White,
+                                            fontSize = 20.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            textAlign = TextAlign.Start
+                                        )
                                     )
-                                )
+                                }
+                                innerTextField()
                             }
-                            innerTextField()
                         }
 
 
@@ -195,7 +228,7 @@ fun AddScreen(viewModel: MainViewModel) {
                                     text = "Edit Family",
                                     buttonColors = ButtonDefaults.buttonColors(
                                         containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                                       contentColor = Color.White
+                                        contentColor = Color.White
                                     )
                                 )
                             }
@@ -238,17 +271,31 @@ fun AddScreen(viewModel: MainViewModel) {
 
         // Method of managing screens
         NavHost(navController = navController, startDestination = "Students",
-            // Disable transitions
-            enterTransition = { EnterTransition.None },
-            exitTransition = { ExitTransition.None },
-            popEnterTransition = { EnterTransition.None },
-            popExitTransition = { ExitTransition.None },
-            ) {
-            composable("Students") { StudentsScreen(students = students, familyName = familyName.value) }
-            composable("Parents") { ParentsScreen(parents = parents, familyName = familyName.value) }
-            composable("Payment ID") { PaymentIDScreen(family = family, familyName, parents = parents, students = students, addState = addState, viewModel = viewModel) }
+        ) {
+            composable("Students") {
+                if (familyName != null) {
+                    StudentsScreen(students = students, familyName = familyName.value)
+                }
+            }
+            composable("Parents") {
+                if (familyName != null) {
+                    ParentsScreen(parents = parents, familyName = familyName.value)
+                }
+            }
+            composable("Payment ID") {
+                family?.let { it1 ->
+                    if (familyName != null) {
+                        PaymentIDScreen(
+                            family = it1,
+                            familyName = familyName,
+                            parents = parents,
+                            students = students,
+                            addState = addState,
+                            viewModel = viewModel
+                        )
+                    }
+                }
+            }
         }
     }
 }
-
-

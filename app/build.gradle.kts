@@ -42,6 +42,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     val room_version = "2.6.1"
 
     implementation("androidx.room:room-runtime:$room_version")
@@ -86,7 +87,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-
+    implementation("com.google.accompanist:accompanist-flowlayout:0.24.10-beta") // Make sure to use the latest version
     implementation("io.realm.kotlin:library-base:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")
 }

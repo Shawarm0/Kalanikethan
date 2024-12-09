@@ -38,23 +38,32 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.lovinsharma.kalanikethan.models.Family
 import com.lovinsharma.kalanikethan.screens.addscreen.AddScreen
 import com.lovinsharma.kalanikethan.screens.HistoryScreen
-import com.lovinsharma.kalanikethan.screens.HomeScreen
+import com.lovinsharma.kalanikethan.screens.homescreen.HomeScreen
 import com.lovinsharma.kalanikethan.screens.PaymentsScreen
 import com.lovinsharma.kalanikethan.screens.SignInScreen
 import com.lovinsharma.kalanikethan.screens.WhoInScreen
+import com.lovinsharma.kalanikethan.screens.homescreen.UpdateScreen
 import com.lovinsharma.kalanikethan.ui.theme.KalanikethanTheme
+import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContent {
             KalanikethanTheme(darkTheme = isSystemInDarkTheme()) {
+                val viewModel: MainViewModel = viewModel()
+                var family: Family? = null
                 Scaffold(
                     modifier = Modifier.fillMaxSize()
                 ) { innerPadding ->
@@ -94,12 +103,16 @@ class MainActivity : ComponentActivity() {
                                 popEnterTransition = { EnterTransition.None },
                                 popExitTransition = { ExitTransition.None },
                                 ) {
-                                composable("Home") { HomeScreen(navController) }
-                                composable("SignIn") { SignInScreen(navController) }
-                                composable("AddScreen") { AddScreen() }
+                                composable("Home") { HomeScreen(viewModel, onEdit = { familyincoming ->
+                                    family = familyincoming
+
+                                    navController.navigate("UpdateScreen")}) }
+                                composable("SignIn") { SignInScreen(viewModel) }
+                                composable("AddScreen") { AddScreen(viewModel) }
                                 composable("WhoInScreen") { WhoInScreen(navController) }
                                 composable("History") { HistoryScreen(navController) }
                                 composable("PaymentsScreen") { PaymentsScreen(navController) }
+                                composable("UpdateScreen") { UpdateScreen(viewModel, family) }
                             }
                         }
                     }
