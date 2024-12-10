@@ -57,12 +57,9 @@ import java.util.Locale
 
 @Composable
 fun AddScreen(viewModel: MainViewModel) {
-    // This is a list of students we will add to every time the add button is pressed on the students screen.
     val students = remember { mutableStateListOf<StudentUI>() }
-
     val parents = remember { mutableStateListOf<ParentUI>() }
 
-    // Everything to do with the family
     val family by remember {
         mutableStateOf(
             FamilyUI(
@@ -75,14 +72,10 @@ fun AddScreen(viewModel: MainViewModel) {
     }
     val familyName = remember { mutableStateOf("") }
 
-
     var showAddButton by remember { mutableStateOf(false) }
     var addState = remember { mutableStateOf(true) }
 
-
-    // This is to manage the moving of screens
     val navController = rememberNavController()
-    // This returns the values "Students" if we are on the students screen. It is to see what the value of the navcontroller is
     val currentDestination = navController.currentBackStackEntryAsState().value?.destination?.route
 
     Column(
@@ -90,161 +83,138 @@ fun AddScreen(viewModel: MainViewModel) {
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
     ) {
-        // This creates the box at the top of the screen
-        Box(
+        // Top Row: Enter Family Name and Navigation Buttons
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(60.dp)
                 .background(color = MaterialTheme.colorScheme.secondary)
-                .padding(horizontal = 30.dp),
-            contentAlignment = Alignment.CenterStart
+                .padding(horizontal = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Enter Family Name field
             Row(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .align(Alignment.CenterStart),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                // This is the enter family name thing
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                ) {
-                    Text(
-                        text = "This is something"
-                    )
-
-                }
-            }
-
-
-            // These are the buttons at the top
-            Row(
-                horizontalArrangement = Arrangement.End,
+                    .weight(1f)
+                    .padding(end = 16.dp), // Add spacing between text field and buttons
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AddScreenButtons(iconResId = R.drawable.student,
-                    text = "Students",
-                    isSelected = currentDestination == "Students",
-                    onClick = { navController.navigate("Students") })
-
-                Spacer(modifier = Modifier.width(8.dp)) // Space between buttons
-                AddScreenButtons(iconResId = R.drawable.parents,
-                    text = "Parents",
-                    isSelected = currentDestination == "Parents",
-                    onClick = { navController.navigate("Parents") })
-
-                Spacer(modifier = Modifier.width(8.dp)) // Space between buttons
-                AddScreenButtons(iconResId = R.drawable.payid,
-                    text = "Payment ID",
-                    isSelected = currentDestination == "Payment ID",
-                    onClick = { navController.navigate("Payment ID") })
-            }
-
-
-        }
-    }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-
-        BasicTextField(
-            value = familyName.value,
-            onValueChange = { input ->
-                familyName.value = input.split(" ")
-                    .joinToString(" ") {
-                        it.replaceFirstChar {
-                            if (it.isLowerCase()) it.titlecase(
-                                Locale.ROOT
-                            ) else it.toString()
-                        }
-                    }
-                showAddButton =
-                    familyName.value.isNotBlank() // Show button if there's input
-            },
-            textStyle = TextStyle(
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Start
-            ),
-            modifier = Modifier
-                .weight(1f), // Ensures text field takes up as much width as possible
-            singleLine = true,
-            cursorBrush = SolidColor(Color.White),
-            keyboardOptions = KeyboardOptions.Default.copy(
-                keyboardType = KeyboardType.Text,
-                capitalization = KeyboardCapitalization.Words // Capitalize first letter of each word
-            ),
-        ) { innerTextField ->
-            if (familyName.value.isEmpty()) {
-                Text(
-                    text = "Enter Family Name",
-                    style = TextStyle(
+                BasicTextField(
+                    value = familyName.value,
+                    onValueChange = { input ->
+                        familyName.value = input.split(" ")
+                            .joinToString(" ") {
+                                it.replaceFirstChar { char ->
+                                    if (char.isLowerCase()) char.titlecase(Locale.ROOT) else char.toString()
+                                }
+                            }
+                        showAddButton = familyName.value.isNotBlank()
+                    },
+                    textStyle = TextStyle(
                         color = Color.White,
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
                         textAlign = TextAlign.Start
-                    )
+                    ),
+                    modifier = Modifier.weight(1f).padding(start=16.dp),
+                    singleLine = true,
+                    cursorBrush = SolidColor(Color.White),
+                    keyboardOptions = KeyboardOptions.Default.copy(
+                        keyboardType = KeyboardType.Text,
+                        capitalization = KeyboardCapitalization.Words
+                    ),
+                ) { innerTextField ->
+                    if (familyName.value.isEmpty()) {
+                        Text(
+                            text = "Enter Family Name",
+                            style = TextStyle(
+                                color = Color.White,
+                                fontSize = 20.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Start
+                            )
+                        )
+                    }
+                    innerTextField()
+                }
+
+                // Add/Edit Family Button
+                if (showAddButton) {
+                    if (addState.value) {
+                        IconButtonWithText(
+                            onClick = {
+                                showAddButton = false
+                                addState.value = false
+                            },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Face,
+                                    contentDescription = "Add Family",
+                                    tint = Color.White
+                                )
+                            },
+                            text = "Add Family",
+                            buttonColors = ButtonDefaults.buttonColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                                contentColor = Color.White
+                            )
+                        )
+                    } else {
+                        IconButtonWithText(
+                            onClick = { showAddButton = false },
+                            icon = {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = "Edit Family",
+                                    tint = Color.White
+                                )
+                            },
+                            text = "Edit Family",
+                            buttonColors = ButtonDefaults.buttonColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
+                                contentColor = Color.White
+                            )
+                        )
+                    }
+                }
+            }
+
+            // Navigation Buttons
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                AddScreenButtons(
+                    iconResId = R.drawable.student,
+                    text = "Students",
+                    isSelected = currentDestination == "Students",
+                    onClick = { navController.navigate("Students") }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                AddScreenButtons(
+                    iconResId = R.drawable.parents,
+                    text = "Parents",
+                    isSelected = currentDestination == "Parents",
+                    onClick = { navController.navigate("Parents") }
+                )
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                AddScreenButtons(
+                    iconResId = R.drawable.payid,
+                    text = "Payment ID",
+                    isSelected = currentDestination == "Payment ID",
+                    onClick = { navController.navigate("Payment ID") }
                 )
             }
-            innerTextField()
         }
 
-
-        if (showAddButton) {
-            if (addState.value) {
-                IconButtonWithText(
-                    modifier = Modifier.padding(10.dp),
-                    onClick = {
-                        showAddButton = false
-                        addState.value = false
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Face,
-                            contentDescription = "Add Family",
-                            tint = Color.White
-                        )
-                    },
-                    text = "Add Family",
-                    buttonColors = ButtonDefaults.buttonColors(
-                        containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
-                    )
-                )
-            } else {
-                IconButtonWithText(
-                    onClick = {
-                        showAddButton = false
-                    },
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit Family",
-                            tint = Color.White
-                        )
-                    },
-                    text = "Edit Family",
-                    buttonColors = ButtonDefaults.buttonColors(
-                        containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.background else MaterialTheme.colorScheme.primary,
-                        contentColor = Color.White
-                    )
-                )
-            }
-
-
-        }
-
-        // Method of managing screens
+        // Navigation Screens
         NavHost(
             navController = navController, startDestination = "Students",
-            // Disable transitions
             enterTransition = { EnterTransition.None },
             exitTransition = { ExitTransition.None },
             popEnterTransition = { EnterTransition.None },
@@ -275,5 +245,7 @@ fun AddScreen(viewModel: MainViewModel) {
         }
     }
 }
+
+
 
 

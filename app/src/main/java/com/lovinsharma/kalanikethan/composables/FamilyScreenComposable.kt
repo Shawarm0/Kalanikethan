@@ -2,6 +2,7 @@ package com.lovinsharma.kalanikethan.composables
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -31,6 +33,9 @@ import com.lovinsharma.kalanikethan.models.Family
 fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
     val students = family.students
     val parents = family.parents
+    val textColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+    val shadeColor = if (isSystemInDarkTheme()) Color.Gray.copy(alpha = 0.4f) else MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f)
+    val shadeColor2 = if (isSystemInDarkTheme()) Color.Gray.copy(alpha = 0.1f) else MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f)
 
     Box(
         modifier = Modifier
@@ -50,7 +55,7 @@ fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
                 text = family.familyName,
                 fontWeight = FontWeight.Bold,
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.primary,
+                color = textColor,
                 modifier = Modifier.padding(bottom = 12.dp) // Space below the family name
             )
 
@@ -68,7 +73,7 @@ fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
                         text = "Students:",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = textColor
                     )
 
                     // FlowRow to display students horizontally, wrapping if needed
@@ -82,11 +87,11 @@ fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
                                     modifier = Modifier
                                         .padding(6.dp)
                                         .background(
-                                            MaterialTheme.colorScheme.secondary.copy(alpha = 0.1f),
+                                            shadeColor,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                                    color = MaterialTheme.colorScheme.secondary
+                                    color = textColor
                                 )
                             }
                         }
@@ -102,7 +107,7 @@ fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
                         text = "Parents:",
                         fontWeight = FontWeight.Bold,
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.primary
+                        color = textColor
                     )
 
                     // FlowRow to display parents horizontally, wrapping if needed
@@ -116,11 +121,11 @@ fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
                                     modifier = Modifier
                                         .padding(6.dp)
                                         .background(
-                                            MaterialTheme.colorScheme.tertiary.copy(alpha = 0.1f),
+                                            shadeColor2,
                                             RoundedCornerShape(8.dp)
                                         )
                                         .padding(horizontal = 12.dp, vertical = 8.dp),
-                                    color = MaterialTheme.colorScheme.secondary
+                                    color = textColor
                                 )
                             }
                         }
@@ -143,7 +148,7 @@ fun FamilyBox(family: Family, onEdit: (Family) -> Unit) {
                         text = "Edit",
                         fontSize = 16.sp,
                         textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onPrimary
+                        color = Color.White
                     )
                 }
             }

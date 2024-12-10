@@ -14,6 +14,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxColors
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -42,7 +44,9 @@ fun StudentBox(
             .height(100.dp)
             .padding(horizontal = 16.dp, vertical = 5.dp)
             .background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(8.dp))
-            .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp))
+            .border(width = 1.dp, color = Color.Gray, shape = RoundedCornerShape(8.dp)),
+        color = MaterialTheme.colorScheme.onSurface,
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             modifier = Modifier.fillMaxSize(),
@@ -128,7 +132,12 @@ fun StudentBox(
                 Checkbox(
                     checked = student.canWalkAlone,
                     onCheckedChange = null, // Make it read-only
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                    colors = CheckboxDefaults.colors(
+                        checkmarkColor = Color.White,
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = if (isSystemInDarkTheme()) Color.Gray else Color.Black,
+                    )
                 )
             }
 
@@ -141,7 +150,7 @@ fun StudentBox(
                     modifier = Modifier
                         .padding(horizontal = 8.dp, vertical = 4.dp)
                         .fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1b69b2)),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = MaterialTheme.shapes.medium
                 ) {
                     Text(
