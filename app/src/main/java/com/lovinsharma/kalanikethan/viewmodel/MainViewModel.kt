@@ -87,6 +87,108 @@ class MainViewModel: ViewModel() {
         }
     }
 
+    private fun updateFamily(
+        familyID: ObjectId,
+        updatedFamily: FamilyUI,
+        updatedParents: List<ParentUI>,
+        updatedStudents: List<StudentUI>
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                // Query inside the write block to ensure the transaction is active
+                val family = query<Family>("_id == $0", familyID).first().find()
+
+                // Only modify the family if it was found
+                if (family != null) {
+                    // Perform the updates inside the write block
+                    family.familyName = updatedFamily.familyName
+                    family.familyEmail = updatedFamily.familyEmail
+                    family.paymentDate = updatedFamily.paymentDate
+                    family.paymentID = updatedFamily.paymentID
+                }
+
+                // Step 2: Get the list of updated students, excluding students with null IDs
+                val updatedStudentIds = updatedStudents.filter { it._id != null }.map { it._id }
+
+                // Step 3: Find students that are in the family but not in the updated list
+                val studentsToRemove = family?.students?.filter { it._id !in updatedStudentIds }
+
+                // Step 4: Remove each student that is not in the updated list
+                studentsToRemove?.forEach { student ->
+                    // Remove the student from the family (if necessary)
+                    family.students.remove(student)
+
+                    delete(student)
+                }
+
+
+                val updatedParentIds = updatedParents.filter { it._id != null }.map { it._id }
+
+                val parentsToRemove = family?.parents?.filter { it._id !in updatedParentIds }
+
+
+                parentsToRemove?.forEach { parent ->
+                    family.parents.remove(parent)
+                    delete(parent)
+                }
+
+
+                updatedStudents.forEach { studentUI ->
+                    if (studentUI._id != null) {
+                        val student = query<Student>("_id == $0", studentUI._id).first().find()
+
+                        if (student != null) {
+                            student.studentName = studentUI.studentName
+                            student.studentNumber = studentUI.studentNumber
+                            student.birthdate = studentUI.birthdate
+                            student.additionalInfo = studentUI.additionalInfo
+                            student.canWalkAlone = studentUI.canWalkAlone
+                        }
+                    } else {
+                        val newStudent = Student().apply {
+                            studentName = studentUI.studentName
+                            studentNumber = studentUI.studentNumber
+                            birthdate = studentUI.birthdate
+                            additionalInfo = studentUI.additionalInfo
+                            canWalkAlone = studentUI.canWalkAlone
+                        }
+
+                        family?.students?.add(newStudent)
+                    }
+
+                }
+
+
+                updatedParents.forEach { parentUI ->
+                    if (parentUI._id != null) {
+                        val parent = query<Parent>("_id == $0", parentUI._id).first().find()
+
+                        if (parent != null) {
+                            parent.parentName = parentUI.parentName
+                            parent.parentNumber = parentUI.parentNumber
+                        }
+                    } else {
+                        val newParent = Parent().apply {
+                            parentName = parentUI.parentName
+                            parentNumber = parentUI.parentNumber
+
+                        }
+                        family?.parents?.add(newParent)
+                    }
+
+                }
+
+
+
+            }
+        }
+    }
+
+
+
+
+
+
 
 
 
@@ -165,6 +267,15 @@ class MainViewModel: ViewModel() {
         parents.clear()
         students.clear()
         addState.value = true
+    }
+
+    fun onSaveButtonPressed(
+        family: FamilyUI,
+        familyId: ObjectId,
+        parents: MutableList<ParentUI>,
+        students: MutableList<StudentUI>
+    ) {
+        updateFamily(familyId, family, parents, students)
     }
 
 }

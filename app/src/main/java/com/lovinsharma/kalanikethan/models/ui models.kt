@@ -1,5 +1,7 @@
 package com.lovinsharma.kalanikethan.models
 
+import org.mongodb.kbson.ObjectId
+
 data class FamilyUI (
     var familyName: String,
     var familyEmail: String,
@@ -8,6 +10,7 @@ data class FamilyUI (
 )
 
 data class StudentUI (
+    val _id: ObjectId? = null, // Include the ObjectId
     val studentName: String,
     val studentNumber: String,
     val birthdate: String,
@@ -16,6 +19,7 @@ data class StudentUI (
 )
 
 data class ParentUI (
+    val _id: ObjectId? = null, // Include the ObjectId
     val parentName: String,
     val parentNumber: String,
 )

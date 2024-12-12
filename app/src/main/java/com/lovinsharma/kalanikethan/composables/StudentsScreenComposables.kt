@@ -354,39 +354,4 @@ fun StudentBox(
         }
     }
 
-
-
-
-//    // Individual composables
-//    TextField(
-//        value = studentName,
-//        onValueChange = { studentName = it },
-//        label = { Text("Student Name") }
-//    )
-//
-//    Spacer(modifier = Modifier.height(8.dp)) // Optional spacing
-//
-//    TextField(
-//        value = studentNumber,
-//        onValueChange = { studentNumber = it },
-//        label = { Text("Student Number") }
-//    )
-//
-//    Spacer(modifier = Modifier.height(8.dp)) // Optional spacing
-//
-//    TextField(
-//        value = studentDOB,
-//        onValueChange = { studentDOB = it },
-//        label = { Text("Date of Birth") }
-//    )
-//
-//    Spacer(modifier = Modifier.height(8.dp)) // Optional spacing
-//
-//    Row {
-//        Checkbox(
-//            checked = canWalkAlone,
-//            onCheckedChange = { canWalkAlone = it }
-//        )
-//        Text("Can walk alone")
-//    }
 }
