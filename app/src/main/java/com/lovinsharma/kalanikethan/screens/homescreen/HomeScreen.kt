@@ -417,15 +417,6 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                     )
             ) {
 
-                Text(
-                    modifier = Modifier.align(Alignment.TopStart).padding(horizontal = 20.dp, vertical = 10.dp),
-                    text = showInfo,
-                    style = TextStyle(
-                        fontWeight = FontWeight.Bold, // Makes the text bold
-                        fontSize = 20.sp, // Adjust font size as needed
-                        color = Color.Black // Sets text color to black
-                    )
-                )
 
 
                 // Main layout
@@ -437,8 +428,19 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                         modifier = Modifier
                             .weight(1f) // Make the scrollable content take up available space
                             .verticalScroll(rememberScrollState())
-                            .padding(top = 50.dp) // Space for the IconButton
+                            .padding(top = 10.dp) // Space for the IconButton
                     ) {
+                            Text(
+                                modifier = Modifier
+                                    .padding(horizontal = 20.dp, vertical = 10.dp),
+                                text = showInfo,
+                                style = TextStyle(
+                                    fontWeight = FontWeight.Bold, // Makes the text bold
+                                    fontSize = 20.sp, // Adjust font size as needed
+                                    color = if (isSystemInDarkTheme()) Color.White else Color.Black // Sets text color to black
+                                )
+                            )
+
                         if (showInfo == "Students") {
                             for (index in students.indices) {
                                 StudentBox2(
@@ -448,7 +450,7 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                                         students[index] = updatedStudent
                                     }
                                 )
-                                Spacer(modifier = Modifier.height(10.dp))
+                                Spacer(modifier = Modifier.height(30.dp))
                             }
                         } else {
                             for (index in parents.indices) {
@@ -461,6 +463,8 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                                         parents.removeAt(index)
                                     }
                                 )
+                                Spacer(modifier = Modifier.height(30.dp))
+
                             }
                         }
                     }
