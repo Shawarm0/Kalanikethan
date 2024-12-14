@@ -26,11 +26,14 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -51,7 +54,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -163,7 +168,8 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
         val students = remember { mutableStateListOf<StudentUI>() }
         val parents = remember { mutableStateListOf<ParentUI>() }
         var showDatePicker by remember { mutableStateOf(false) } // State to control dialog visibility
-
+        var expanded by remember { mutableStateOf(false) }
+        var showInfo by remember { mutableStateOf("Students") }
 
         val formattedDate: String = if (family.paymentDate == 0L)
             ""
@@ -211,206 +217,319 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
             )
         }
 
-        Box(
+
+
+
+        Column(
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            Column(
+            Box(
                 modifier = Modifier
-                    .fillMaxSize().verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .fillMaxWidth()
+                    .padding(horizontal = 10.dp)
+                    .background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(16.dp))
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        RoundedCornerShape(16.dp)
+                    ),
             ) {
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(10.dp)
-                        .background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(16.dp))
-                        .border(
-                            1.dp,
-                            MaterialTheme.colorScheme.surfaceVariant,
-                            RoundedCornerShape(16.dp)
-                        ),
+                Column(
+                    modifier = Modifier.padding(10.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.padding(10.dp)
+                    // Family name and Payment ID Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(30.dp)
                     ) {
-                        // Family name and Payment ID Row
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                            horizontalArrangement = Arrangement.spacedBy(30.dp)
+                        OutlinedTextField(
+                            value = familyui.value.familyName,
+                            onValueChange = { newValue ->
+                                familyui.value = familyui.value.copy(familyName = newValue)
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                            ),
+                            label = { Text("Family Name") },
+                            placeholder = { Text("Enter family name") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = "Family Icon"
+                                )
+                            },
+                            singleLine = true
+                        )
+
+                        OutlinedTextField(
+                            value = familyui.value.paymentID,
+                            onValueChange = { newValue ->
+                                familyui.value = familyui.value.copy(paymentID = newValue)
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                            ),
+                            label = { Text("Payment ID") },
+                            placeholder = { Text("Enter payment ID") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Info,
+                                    contentDescription = "Payment Icon"
+                                )
+                            },
+                            singleLine = true
+                        )
+
+
+                    }
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Family email and Payment Date Row
+                    Row(
+                        modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
+                        horizontalArrangement = Arrangement.spacedBy(30.dp)
+                    ) {
+                        OutlinedTextField(
+                            value = familyui.value.familyEmail,
+                            onValueChange = { newValue ->
+                                familyui.value = familyui.value.copy(familyEmail = newValue)
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                            ),
+                            label = { Text("Family Email") },
+                            placeholder = { Text("Enter family email") },
+                            leadingIcon = {
+                                Icon(
+                                    imageVector = Icons.Default.Email,
+                                    contentDescription = "Email Icon"
+                                )
+                            },
+                            singleLine = true
+                        )
+
+                        OutlinedTextField(
+                            value = formmattedDate.value,
+                            onValueChange = { newDate ->
+                                familyui.value =
+                                    familyui.value.copy(paymentDate = convertDateToLong(newDate))
+                            },
+                            modifier = Modifier
+                                .weight(1f),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                            ),
+                            label = { Text("Payment Date") },
+                            placeholder = { Text("Click date icon to enter payment date") },
+                            leadingIcon = {
+                                IconButton(onClick = { showDatePicker = true }) {
+                                    Icon(
+                                        imageVector = Icons.Default.DateRange,
+                                        contentDescription = "Select date"
+                                    )
+                                }
+                            },
+                            readOnly = true, // Make field read-only so users can only select a date
+                            singleLine = true
+                        )
+
+
+                    }
+
+                    Row(
+                        horizontalArrangement = Arrangement.End,
+                        modifier = Modifier.fillMaxWidth(),
+                    ) {
+                        Button(
+                            onClick = {
+                            },
+                            modifier = Modifier.width(200.dp).padding(10.dp),
+                            shape = MaterialTheme.shapes.medium,
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color.Red,
+                                contentColor = Color.White,
+                            ),
                         ) {
-                            OutlinedTextField(
-                                value = familyui.value.familyName,
-                                onValueChange = { newValue ->
-                                    familyui.value = familyui.value.copy(familyName = newValue)
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-                                ),
-                                label = { Text("Family Name") },
-                                placeholder = { Text("Enter family name") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Person,
-                                        contentDescription = "Family Icon"
-                                    )
-                                },
-                                singleLine = true
+                            Icon(
+                                imageVector = Icons.Default.Delete,
+                                contentDescription = "Delete Family",
+                                tint = Color.White
                             )
-
-                            OutlinedTextField(
-                                value = familyui.value.paymentID,
-                                onValueChange = { newValue ->
-                                    familyui.value = familyui.value.copy(paymentID = newValue)
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-                                ),
-                                label = { Text("Payment ID") },
-                                placeholder = { Text("Enter payment ID") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Info,
-                                        contentDescription = "Payment Icon"
-                                    )
-                                },
-                                singleLine = true
-                            )
-                        }
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // Family email and Payment Date Row
-                        Row(
-                            modifier = Modifier.fillMaxWidth().padding(horizontal = 10.dp),
-                            horizontalArrangement = Arrangement.spacedBy(30.dp)
-                        ) {
-                            OutlinedTextField(
-                                value = familyui.value.familyEmail,
-                                onValueChange = { newValue ->
-                                    familyui.value = familyui.value.copy(familyEmail = newValue)
-                                },
-                                modifier = Modifier.weight(1f),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-                                ),
-                                label = { Text("Family Email") },
-                                placeholder = { Text("Enter family email") },
-                                leadingIcon = {
-                                    Icon(
-                                        imageVector = Icons.Default.Email,
-                                        contentDescription = "Email Icon"
-                                    )
-                                },
-                                singleLine = true
-                            )
-
-                            OutlinedTextField(
-                                value = formmattedDate.value,
-                                onValueChange = { newDate ->
-                                    familyui.value =
-                                        familyui.value.copy(paymentDate = convertDateToLong(newDate))
-                                },
-                                modifier = Modifier
-                                    .weight(1f),
-                                colors = TextFieldDefaults.outlinedTextFieldColors(
-                                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-                                ),
-                                label = { Text("Payment Date") },
-                                placeholder = { Text("Click date icon to enter payment date") },
-                                leadingIcon = {
-                                    IconButton(onClick = { showDatePicker = true }) {
-                                        Icon(
-                                            imageVector = Icons.Default.DateRange,
-                                            contentDescription = "Select date"
-                                        )
-                                    }
-                                },
-                                readOnly = true, // Make field read-only so users can only select a date
-                                singleLine = true
-                            )
-
-
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Delete Family", color = Color.White)
                         }
                     }
+
+
                 }
+            }
 
-                // Show DatePickerDialog when 'showDatePicker' is true
-                if (showDatePicker) {
-                    DatePickerModal(
-                        onDateSelected = { newDateMillis ->
-                            newDateMillis?.let {
-                                formmattedDate.value =
-                                    SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
-                                        Date(it)
-                                    )
-                                familyui.value = familyui.value.copy(paymentDate = it)
-                            }
-                            showDatePicker = false // Hide the modal after selection
-                        },
-                        onDismiss = {
-                            showDatePicker = false // Hide the modal if dismissed
-                        }
-                    )
-                }
-
-
-                Row {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        for (index in students.indices) {
-                            StudentBox2(
-                                student = students[index],
-                                students = students,
-                                onStudentChange = { updatedStudent ->
-                                    students[index] = updatedStudent
-                                })
-                        }
-
-                        Row {
-                            Button(
-                                onClick = {
-
-                                },
-                                modifier = Modifier.padding(20.dp).weight(0.5f),
-                                shape = MaterialTheme.shapes.medium,
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color.Red,
-                                    contentColor = Color.White,
-                                ),
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = "Delete Family",
-                                    tint = Color.White
+            // Show DatePickerDialog when 'showDatePicker' is true
+            if (showDatePicker) {
+                DatePickerModal(
+                    onDateSelected = { newDateMillis ->
+                        newDateMillis?.let {
+                            formmattedDate.value =
+                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(
+                                    Date(it)
                                 )
-                                Spacer(modifier = Modifier.width(8.dp))
-                                Text("Delete Family", color = Color.White)
+                            familyui.value = familyui.value.copy(paymentDate = it)
+                        }
+                        showDatePicker = false // Hide the modal after selection
+                    },
+                    onDismiss = {
+                        showDatePicker = false // Hide the modal if dismissed
+                    }
+                )
+            }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(10.dp)
+                    .background(MaterialTheme.colorScheme.onSurface, RoundedCornerShape(16.dp))
+                    .border(
+                        1.dp,
+                        MaterialTheme.colorScheme.surfaceVariant,
+                        RoundedCornerShape(16.dp)
+                    )
+            ) {
+
+                Text(
+                    modifier = Modifier.align(Alignment.TopStart).padding(horizontal = 20.dp, vertical = 10.dp),
+                    text = showInfo,
+                    style = TextStyle(
+                        fontWeight = FontWeight.Bold, // Makes the text bold
+                        fontSize = 20.sp, // Adjust font size as needed
+                        color = Color.Black // Sets text color to black
+                    )
+                )
+
+
+                // Main layout
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Scrollable content
+                    Column(
+                        modifier = Modifier
+                            .weight(1f) // Make the scrollable content take up available space
+                            .verticalScroll(rememberScrollState())
+                            .padding(top = 50.dp) // Space for the IconButton
+                    ) {
+                        if (showInfo == "Students") {
+                            for (index in students.indices) {
+                                StudentBox2(
+                                    student = students[index],
+                                    students = students,
+                                    onStudentChange = { updatedStudent ->
+                                        students[index] = updatedStudent
+                                    }
+                                )
+                                Spacer(modifier = Modifier.height(10.dp))
+                            }
+                        } else {
+                            for (index in parents.indices) {
+                                ParentsBox(
+                                    parent = parents[index],
+                                    onParentChange = { updatedParent ->
+                                        parents[index] = updatedParent
+                                    },
+                                    onRemove = {
+                                        parents.removeAt(index)
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+
+
+                    // Buttons section
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp).padding(bottom = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp) // Space between buttons
+                    ) {
+
+                        Row( ) {
+                            if (showInfo == "Students") {
+                                // Button for adding students
+                                Button(
+                                    onClick = {
+                                        students.add(
+                                            StudentUI(
+                                                _id = null,
+                                                studentName = "",
+                                                studentNumber = "",
+                                                birthdate = "",
+                                                additionalInfo = "",
+                                                canWalkAlone = false,
+                                            )
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                        contentColor = Color.White
+                                    ),
+                                    shape = MaterialTheme.shapes.medium,
+                                    modifier = Modifier.width(200.dp).align(Alignment.CenterVertically)
+                                ) {
+                                    Icon(Icons.Filled.Add, contentDescription = "Add Student")
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = "Add Student")
+                                }
+                            } else {
+                                // Button for adding parents
+                                Button(
+                                    onClick = {
+                                        parents.add(
+                                            ParentUI(
+                                                _id = null,
+                                                parentName = "",
+                                                parentNumber = "",
+                                            )
+                                        )
+                                    },
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = MaterialTheme.colorScheme.secondary,
+                                        contentColor = Color.White
+                                    ),
+                                    shape = MaterialTheme.shapes.medium,
+                                    modifier = Modifier.width(200.dp).align(Alignment.CenterVertically)
+                                ) {
+                                    Icon(Icons.Filled.Add, contentDescription = "Add Parent")
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text(text = "Add Parent")
+                                }
                             }
 
+                            Spacer(modifier = Modifier.width(10.dp))
 
-                            Spacer(modifier = Modifier.height(30.dp))
-
+                            // Save button
                             Button(
                                 onClick = {
                                     viewModel.onSaveButtonPressed(
@@ -419,55 +538,65 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                                         parents = parents,
                                         students = students
                                     )
-
                                     navcontroller.navigate("Families")
-
                                 },
-                                modifier = Modifier.padding(20.dp).weight(0.5f),
-                                shape = MaterialTheme.shapes.medium,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = Color(0xFF66BB6A) ,
-                                    contentColor = Color.White,
-                                )
+                                    containerColor = Color(0xFF66BB6A),
+                                    contentColor = Color.White
+                                ),
+                                shape = MaterialTheme.shapes.medium,
+                                modifier = Modifier.width(200.dp).align(Alignment.CenterVertically)
                             ) {
-                                Icon(
-                                    imageVector = Icons.Default.Check,
-                                    contentDescription = "Save",
-                                    tint = Color.White
-                                )
+                                Icon(Icons.Filled.Add, contentDescription = "Save")
                                 Spacer(modifier = Modifier.width(8.dp))
-                                Text("Save", color = Color.White)
+                                Text(text = "Save")
                             }
 
 
                         }
 
                     }
-
-                    Spacer(modifier = Modifier.width(10.dp))
-
-
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        for (index in parents.indices) {
-                            ParentsBox(
-                                parent = parents[index],
-                                onParentChange = { updatedParent ->
-                                    parents[index] = updatedParent
-                                },
-                                onRemove = {
-                                    parents.removeAt(index)
-                                }
-                            )
-                        }
-
-                    }
-
-
                 }
 
-                Spacer(modifier = Modifier.height(10.dp))
+
+
+                // IconButton at the top
+                IconButton(
+                    onClick = { expanded = !expanded },
+                    modifier = Modifier.align(Alignment.TopEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "More",
+                    )
+                    DropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    "Student Information",
+                                    color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                                )
+                            },
+                            onClick = {
+                                showInfo = "Students"
+                                expanded = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    "Parent Information",
+                                    color = if (isSystemInDarkTheme()) Color.White else Color.Black
+                                )
+                            },
+                            onClick = {
+                                showInfo = "Parents"
+                                expanded = false
+                            }
+                        )
+                    }
+                }
+
 
 
 
@@ -478,53 +607,10 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
 
 
 
-            // Floating Action Button positioned at the bottom right
-            ExtendedFloatingActionButton(
-                onClick = {
-                    students.add(
-                        StudentUI(
-                            _id = null,
-                            studentName = "",
-                            studentNumber = "",
-                            birthdate = "",
-                            additionalInfo = "",
-                            canWalkAlone = false,
-                        )
-                    )
-                },
-                icon = { Icon(Icons.Filled.Add, contentDescription = "Add Student") },
-                text = { Text(text = "Add Student") },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom =16.dp, end = 236.dp).width(200.dp) // Add padding only to the FAB, not the scrollable content
-            )
 
-
-            // Floating Action Button positioned at the bottom right
-            ExtendedFloatingActionButton(
-                onClick = {
-                    parents.add(
-                        ParentUI(
-                            _id = null,
-                            parentName = "",
-                            parentNumber = "",
-                        )
-                    )
-                },
-                icon = { Icon(Icons.Filled.Add, contentDescription = "Add Parent") },
-                text = { Text(text = "Add Parent") },
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = Color.White,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp).width(200.dp) // Add padding only to the FAB, not the scrollable content
-            )
 
         }
     }
-
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -550,14 +636,12 @@ fun ParentsBox(
     }
 
     Box(
-        modifier = Modifier
-            .padding(10.dp)
+        modifier = Modifier.padding(horizontal = 20.dp)
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.onSurface,
                 shape = RoundedCornerShape(12.dp)
             )
-            .padding(10.dp) // Inner padding for the content
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -593,6 +677,8 @@ fun ParentsBox(
                     singleLine = true
                 )
 
+                Spacer(modifier = Modifier.width(0.dp))
+
                 OutlinedTextField(
                     value = parentNumber,
                     onValueChange = { parentNumber = it },
@@ -627,8 +713,7 @@ fun ParentsBox(
                     containerColor = Color.Red
                 ),
                 modifier = Modifier
-                    .fillMaxWidth(0.5f) // Make the button take up half the width of the column
-                    .padding(8.dp), // Optional padding for spacing
+                    .fillMaxWidth(0.25f), // Make the button take up half the width of the column , // Optional padding for spacing
                 shape = MaterialTheme.shapes.medium
             ) {
                 Icon(
@@ -678,150 +763,163 @@ fun StudentBox2(
     }
 
     Column(
-        modifier = Modifier
-            .padding(10.dp)
-            .fillMaxWidth() // Limit width to half the screen
-            .background(
-                color = MaterialTheme.colorScheme.onSurface,
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(10.dp) // Inner padding for the content
+        modifier = Modifier.background(color = Color.Transparent)
+            .padding(horizontal = 20.dp)// Inner padding for the content
     ) {
-        // Student Name Field
-        OutlinedTextField(
-            value = studentName,
-            onValueChange = { input ->
-                studentName = input.split(" ")
-                    .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase(Locale.ROOT) } }
-            },
-            label = { Text("Student Name") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-            ),
-            leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Person Icon") }
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Student Number Field
-        OutlinedTextField(
-            value = studentNumber,
-            onValueChange = { studentNumber = it },
-            label = { Text("Student Number") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-            ),
-            leadingIcon = { Icon(Icons.Default.Call, contentDescription = "Call icon") },
-            keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Date of Birth Field
-        OutlinedTextField(
-            value = studentDOB,
-            onValueChange = { studentDOB = it },
-            label = { Text("Click icon to set dob") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            readOnly = true,
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
-                focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
-            ),
-            leadingIcon = {
-                IconButton(onClick = { showDatePicker = true }) {
-                    Icon(imageVector = Icons.Default.DateRange, contentDescription = "Select date")
-                }
-            }
-        )
-
-        if (showDatePicker) {
-            DatePickerModal(
-                onDateSelected = { newDateMillis ->
-                    newDateMillis?.let {
-                        studentDOB = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it))
-                    }
-                    showDatePicker = false
-                },
-                onDismiss = { showDatePicker = false }
-            )
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Can Walk Alone Checkbox
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Checkbox(
-                checked = canWalkAlone,
-                onCheckedChange = { canWalkAlone = it },
-                colors = CheckboxDefaults.colors(
-                    checkmarkColor = Color.White,
-                    checkedColor = MaterialTheme.colorScheme.primary,
-                    uncheckedColor = if (isSystemInDarkTheme()) Color.Gray else Color.Black,
-                )
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("Can walk alone", style = MaterialTheme.typography.bodyLarge)
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Buttons
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp),
             modifier = Modifier.fillMaxWidth()
         ) {
-            Button(
-                onClick = {
-                    showAdditionalInfo = !showAdditionalInfo
-                    showAdditionalInfoButton = !showAdditionalInfoButton
+            // Student Name Field
+            OutlinedTextField(
+                value = studentName,
+                onValueChange = { input ->
+                    studentName = input.split(" ")
+                        .joinToString(" ") { it.replaceFirstChar { char -> char.uppercase(Locale.ROOT) } }
                 },
-                modifier = Modifier.weight(1f),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "Additional Info",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(if (showAdditionalInfo) "Hide Additional Info" else "Show Additional Info")
-            }
+                label = { Text("Student Name") },
+                singleLine = true,
+                modifier = Modifier.weight(1f), // Use weight to make this field take up half the screen
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                ),
+                leadingIcon = { Icon(Icons.Default.Person, contentDescription = "Person Icon") }
+            )
 
-            Button(
-                onClick = { students.remove(student) },
-                colors = ButtonDefaults.buttonColors(containerColor = Color.Red, contentColor = Color.White),
-                modifier = Modifier.weight(1f),
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove Parent",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Remove")
-            }
+            Spacer(modifier = Modifier.width(30.dp)) // Spacer with width 30dp
+
+            // Student Number Field
+            OutlinedTextField(
+                value = studentNumber,
+                onValueChange = { studentNumber = it },
+                label = { Text("Student Number") },
+                singleLine = true,
+                modifier = Modifier.weight(1f), // Use weight to make this field take up half the screen
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                ),
+                leadingIcon = { Icon(Icons.Default.Call, contentDescription = "Call icon") },
+                keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.NumberPassword)
+            )
         }
 
         Spacer(modifier = Modifier.height(10.dp))
 
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            // Date of Birth Field
+            OutlinedTextField(
+                value = studentDOB,
+                onValueChange = { studentDOB = it },
+                label = { Text("Click icon to set dob") },
+                modifier = Modifier,
+                singleLine = true,
+                readOnly = true,
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    focusedBorderColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary,
+                    focusedLabelColor = if (isSystemInDarkTheme()) Color.White else MaterialTheme.colorScheme.primary
+                ),
+                leadingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
+                }
+            )
+
+            if (showDatePicker) {
+                DatePickerModal(
+                    onDateSelected = { newDateMillis ->
+                        newDateMillis?.let {
+                            studentDOB =
+                                SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(it))
+                        }
+                        showDatePicker = false
+                    },
+                    onDismiss = { showDatePicker = false }
+                )
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // Can Walk Alone Checkbox
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Checkbox(
+                    checked = canWalkAlone,
+                    onCheckedChange = { canWalkAlone = it },
+                    colors = CheckboxDefaults.colors(
+                        checkmarkColor = Color.White,
+                        checkedColor = MaterialTheme.colorScheme.primary,
+                        uncheckedColor = if (isSystemInDarkTheme()) Color.Gray else Color.Black,
+                    )
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text("Can walk alone", style = MaterialTheme.typography.bodyLarge)
+            }
+
+            Spacer(modifier = Modifier.width(10.dp))
+
+            // Buttons
+            Row(
+                horizontalArrangement = Arrangement.End,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Button(
+                    onClick = {
+                        showAdditionalInfo = !showAdditionalInfo
+                        showAdditionalInfoButton = !showAdditionalInfoButton
+                    },
+                    modifier = Modifier,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Additional Info",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(if (showAdditionalInfo) "Hide Additional Info" else "Show Additional Info")
+                }
+
+                Spacer(modifier = Modifier.width(10.dp))
+
+                Button(
+                    onClick = { students.remove(student) },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Red,
+                        contentColor = Color.White
+                    ),
+                    modifier = Modifier,
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove Parent",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Remove")
+                }
+            }
+
+
+        }
+
+        Spacer(modifier = Modifier.height(10.dp))
         // Additional Info Field
         if (showAdditionalInfo) {
             OutlinedTextField(
@@ -841,6 +939,7 @@ fun StudentBox2(
         }
     }
 }
+
 
 
 
