@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -71,6 +72,7 @@ import androidx.navigation.compose.rememberNavController
 import com.lovinsharma.kalanikethan.R
 import com.lovinsharma.kalanikethan.composables.AddScreenButtons
 import com.lovinsharma.kalanikethan.composables.DatePickerModal
+import com.lovinsharma.kalanikethan.composables.DeleteFamilyAlert
 import com.lovinsharma.kalanikethan.composables.StudentBox
 import com.lovinsharma.kalanikethan.models.Family
 import com.lovinsharma.kalanikethan.models.FamilyUI
@@ -170,6 +172,7 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
         var showDatePicker by remember { mutableStateOf(false) } // State to control dialog visibility
         var expanded by remember { mutableStateOf(false) }
         var showInfo by remember { mutableStateOf("Students") }
+        var confirmDelete by remember { mutableStateOf(false) }
 
         val formattedDate: String = if (family.paymentDate == 0L)
             ""
@@ -364,6 +367,7 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                     ) {
                         Button(
                             onClick = {
+                                confirmDelete = true
                             },
                             modifier = Modifier.width(200.dp).padding(10.dp),
                             shape = MaterialTheme.shapes.medium,
@@ -385,6 +389,20 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
 
                 }
             }
+
+            if (confirmDelete) {
+                DeleteFamilyAlert(
+                    onDismissRequest = { confirmDelete = false },
+                    onConfirmation = {
+                        viewModel.deleteFamily(familyID.value)
+                        confirmDelete = false
+                        navcontroller.navigate("Families") },
+                    dialogTitle = "Delete Family",
+                    dialogText = "Are you sure you want to delete this family?",
+                    icon = Icons.Default.Warning
+                )
+            }
+
 
             // Show DatePickerDialog when 'showDatePicker' is true
             if (showDatePicker) {
@@ -896,7 +914,9 @@ fun StudentBox2(
                         tint = Color.White
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(if (showAdditionalInfo) "Hide Additional Info" else "Show Additional Info")
+                    Text(
+                        text = if (showAdditionalInfo) "Hide Additional Info" else "Show Additional Info",
+                        color = Color.White)
                 }
 
                 Spacer(modifier = Modifier.width(10.dp))

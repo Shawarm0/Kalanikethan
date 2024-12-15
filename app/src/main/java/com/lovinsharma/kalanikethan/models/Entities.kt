@@ -4,6 +4,7 @@ import io.realm.kotlin.ext.realmListOf
 import io.realm.kotlin.types.EmbeddedRealmObject
 import io.realm.kotlin.types.RealmList
 import io.realm.kotlin.types.RealmObject
+import io.realm.kotlin.types.annotations.Index
 import io.realm.kotlin.types.annotations.PrimaryKey
 import org.mongodb.kbson.ObjectId
 
@@ -45,11 +46,12 @@ class Parent: RealmObject {
     var parentNumber: String = ""
 }
 
-class SignInEvent: EmbeddedRealmObject {
-    var day: String = ""
+class SignInEvent: RealmObject {
+    @Index var day: String = ""
     var student: Student? = null
     var signIn: Long = 0L
-    var signOut: Long = 0L
+    var signOut: Long? = null
+    var live: Boolean = false
 }
 
 class Payment: RealmObject {

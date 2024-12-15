@@ -1,5 +1,6 @@
 package com.lovinsharma.kalanikethan.viewmodel
 
+import android.provider.SyncStateContract.Helpers.insert
 import android.util.Log
 import androidx.compose.runtime.MutableState
 import androidx.lifecycle.ViewModel
@@ -19,10 +20,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.liveData
+import com.lovinsharma.kalanikethan.models.SignInEvent
+import com.lovinsharma.kalanikethan.screens.getFormattedDay
 import io.realm.kotlin.ext.query
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import org.mongodb.kbson.ObjectId
+import java.util.Date
 
 class MainViewModel: ViewModel() {
 
@@ -86,6 +90,85 @@ class MainViewModel: ViewModel() {
             }
         }
     }
+
+
+    fun deleteFamily(
+        familyID: ObjectId
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                // Query the family itself
+                val family = query<Family>("_id == $0", familyID).first().find()
+
+                if (family != null) {
+                    // Delete all students and parents associated with the family
+                    delete(family.students)
+                    delete(family.parents)
+
+                    // Delete the family
+                    delete(family)
+                }
+            }
+        }
+    }
+
+
+    fun signInStudent(studentID: ObjectId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                // Find the student to sign in
+                val student = query<Student>("_id == $0", studentID).first().find()
+
+                if (student != null) {
+                    // Create a new sign-in event
+                    val signInStudent = SignInEvent().apply {
+                        day = getFormattedDay(Date()) // Format the current date
+                        this.student = student
+                        signIn = System.currentTimeMillis() - (System.currentTimeMillis() % 60000) // Current time in milliseconds
+                        signOut = null // Not signed out yet
+                        live = true // Event is active
+                    }
+
+                    copyToRealm(signInStudent)
+
+                }
+            }
+        }
+    }
+
+    fun getUniqueDays(): List<String> {
+        return realm.query<SignInEvent>()
+            .distinct("day") // Fetch unique values of 'day'
+            .find()
+            .map { it.day } // Extract the 'day' property
+    }
+
+
+    fun getEventsForDay(day: String): List<SignInEvent> {
+        return realm.query<SignInEvent>("day == $0", day)
+            .find()
+    }
+
+    fun signOutStudent(studentID: ObjectId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                // Find the active sign-in event for the student
+                val signInEvent = query<SignInEvent>(
+                    "student._id == $0 AND live == true",
+                    studentID
+                ).first().find()
+
+                if (signInEvent != null) {
+                    // Update the event with sign-out time and mark as inactive
+                    signInEvent.signOut = System.currentTimeMillis() - (System.currentTimeMillis() % 60000)
+                    signInEvent.live = false
+                }
+            }
+        }
+    }
+
+
+
 
     private fun updateFamily(
         familyID: ObjectId,

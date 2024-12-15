@@ -30,6 +30,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lovinsharma.kalanikethan.composables.StudentBox
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun SignInScreen(viewModel: MainViewModel) {
@@ -60,11 +63,12 @@ fun SignInScreen(viewModel: MainViewModel) {
             )
         }
 
-        LazyColumn {
+        LazyColumn() {
             items(students) { student ->
                 StudentBox(
                     student = student,
-                    onSignIn = { student1 -> viewModel.signIn(student1) },
+                    onSignIn = { student1 -> viewModel.signIn(student1)
+                               viewModel.signInStudent(student1._id)},
                     bootstring = "Sign In"
                     )
             }
@@ -76,4 +80,23 @@ fun SignInScreen(viewModel: MainViewModel) {
     }
 
 
+}
+
+fun getFormattedDay(date: Date): String {
+    val dayFormat = SimpleDateFormat("d", Locale.getDefault())
+    val monthFormat = SimpleDateFormat("MMMM", Locale.getDefault())
+
+    val day = dayFormat.format(date).toInt()
+    val month = monthFormat.format(date)
+
+    // Determine the correct ordinal suffix
+    val suffix = when {
+        day in 11..13 -> "th"
+        day % 10 == 1 -> "st"
+        day % 10 == 2 -> "nd"
+        day % 10 == 3 -> "rd"
+        else -> "th"
+    }
+
+    return "$day$suffix $month"
 }

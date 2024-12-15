@@ -65,7 +65,8 @@ fun WhoInScreen(navController: NavController) {
             items(students) { student ->
                 StudentBox(
                     student = student,
-                    onSignIn = { viewModel.signOut(student) },
+                    onSignIn = { viewModel.signOut(student)
+                               viewModel.signOutStudent(student._id)},
                     bootstring = "Sign Out"
                 )
             }

@@ -106,7 +106,7 @@ class MainActivity : ComponentActivity() {
                                 composable("SignIn") { SignInScreen(viewModel) }
                                 composable("AddScreen") { AddScreen(viewModel) }
                                 composable("WhoInScreen") { WhoInScreen(navController) }
-                                composable("History") { HistoryScreen(navController) }
+                                composable("History") { HistoryScreen(viewModel) }
                                 composable("PaymentsScreen") { PaymentsScreen(navController) } }
                         }
                     }
