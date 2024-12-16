@@ -361,30 +361,7 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
 
                     }
 
-                    Row(
-                        horizontalArrangement = Arrangement.End,
-                        modifier = Modifier.fillMaxWidth(),
-                    ) {
-                        Button(
-                            onClick = {
-                                confirmDelete = true
-                            },
-                            modifier = Modifier.width(200.dp).padding(10.dp),
-                            shape = MaterialTheme.shapes.medium,
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color.Red,
-                                contentColor = Color.White,
-                            ),
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "Delete Family",
-                                tint = Color.White
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            Text("Delete Family", color = Color.White)
-                        }
-                    }
+
 
 
                 }
@@ -574,6 +551,32 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                                 Text(text = "Save")
                             }
 
+                            Row(
+                                horizontalArrangement = Arrangement.End,
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                Button(
+                                    onClick = {
+                                        confirmDelete = true
+                                    },
+                                    modifier = Modifier.width(200.dp),
+                                    shape = MaterialTheme.shapes.medium,
+                                    colors = ButtonDefaults.buttonColors(
+                                        containerColor = Color.Red ,
+                                        contentColor = Color.White,
+                                    ),
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Delete,
+                                        contentDescription = "Delete Family",
+                                        tint = Color.White
+                                    )
+                                    Spacer(modifier = Modifier.width(8.dp))
+                                    Text("Delete Family", color = Color.White)
+                                }
+                            }
+
 
                         }
 
@@ -667,11 +670,13 @@ fun ParentsBox(
     ) {
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.fillMaxWidth()
         ) {
             // Row with Parent Name and Parent Number
             Row(
                 horizontalArrangement = Arrangement.spacedBy(16.dp),
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 OutlinedTextField(
@@ -725,27 +730,28 @@ fun ParentsBox(
                     ),
                     singleLine = true
                 )
+                Button(
+                    onClick = onRemove,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(254, 100, 100)
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.25f), // Make the button take up half the width of the column , // Optional padding for spacing
+                    shape = MaterialTheme.shapes.medium
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove Parent",
+                        tint = Color.White
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Remove", color = Color.White)
+                }
             }
 
 
 
-            Button(
-                onClick = onRemove,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color.Red
-                ),
-                modifier = Modifier
-                    .fillMaxWidth(0.25f), // Make the button take up half the width of the column , // Optional padding for spacing
-                shape = MaterialTheme.shapes.medium
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = "Remove Parent",
-                    tint = Color.White
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text("Remove", color = Color.White)
-            }
+
 
         }
     }
@@ -924,7 +930,7 @@ fun StudentBox2(
                 Button(
                     onClick = { students.remove(student) },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.Red,
+                        containerColor = Color(254, 100, 100),
                         contentColor = Color.White
                     ),
                     modifier = Modifier,

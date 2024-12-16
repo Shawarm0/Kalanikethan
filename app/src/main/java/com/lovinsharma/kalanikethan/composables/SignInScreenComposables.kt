@@ -34,7 +34,7 @@ import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 fun StudentBox(
     student: Student,
     onSignIn: (Student) -> Unit,
-    bootstring: String,
+    bootstring: String?,
 ) {
     val textColor = if (isSystemInDarkTheme()) Color.White else Color.Black
 
@@ -141,26 +141,32 @@ fun StudentBox(
                 )
             }
 
-            // Sign In Button
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Button(
-                    onClick = { onSignIn(student) },
-                    modifier = Modifier
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
-                        .fillMaxWidth(),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(
-                        text = bootstring,
-                        fontSize = 12.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.White
-                    )
+
+                if (bootstring != null) {
+
+                    // Sign In Button
+                    Column(
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Button(
+                            onClick = { onSignIn(student) },
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .fillMaxWidth(),
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                            shape = MaterialTheme.shapes.medium
+                        ) {
+                            Text(
+                                text = bootstring,
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                color = Color.White
+                            )
+                        }
+                    }
+
                 }
-            }
+
 
 
 

@@ -23,8 +23,12 @@ import androidx.lifecycle.liveData
 import com.lovinsharma.kalanikethan.models.SignInEvent
 import com.lovinsharma.kalanikethan.screens.getFormattedDay
 import io.realm.kotlin.ext.query
+import io.realm.kotlin.query.RealmQuery
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
 import java.util.Date
 
@@ -35,6 +39,19 @@ class MainViewModel: ViewModel() {
     // To observe changes in the students that aren't signed in
     private val _unsignedStudents = MutableStateFlow<List<Student>>(emptyList())
     val unsignedStudents: StateFlow<List<Student>> get() = _unsignedStudents
+    // Mutable state for the search query
+    private val _searchQuery = MutableStateFlow<String>("")
+    val searchQuery: StateFlow<String> get() = _searchQuery
+    // To observe the students list with the search query applied
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val studentsFlow: Flow<List<Student>> = _searchQuery.flatMapLatest { query ->
+        getStudentsFlow(query)
+    }
+
+    // Function to update the search query
+    fun updateSearchQuery(query: String) {
+        _searchQuery.value = query
+    }
 
 
     private val _signedStudents = MutableStateFlow<List<Student>>(emptyList())
@@ -169,7 +186,6 @@ class MainViewModel: ViewModel() {
 
 
 
-
     private fun updateFamily(
         familyID: ObjectId,
         updatedFamily: FamilyUI,
@@ -271,6 +287,21 @@ class MainViewModel: ViewModel() {
 
 
 
+
+
+    fun getStudentsFlow(searchQuery: String? = null): Flow<List<Student>> = flow {
+            val query: RealmQuery<Student> = if (searchQuery.isNullOrBlank()) {
+                // Fetch all students if no search query is provided
+                realm.query(Student::class)
+            } else {
+                // Fetch students whose name contains the search query (case-insensitive)
+                realm.query(Student::class, "studentName LIKE $0", "*${searchQuery}*")
+            }
+
+            // Emit the query results as a list
+            emit(query.find())
+
+    }
 
 
 
