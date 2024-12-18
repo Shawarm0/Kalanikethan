@@ -66,7 +66,8 @@ fun AddScreen(viewModel: MainViewModel) {
                 familyName = "",
                 familyEmail = "",
                 paymentDate = 0L,
-                paymentID = ""
+                paymentID = "",
+                 paymentAmount = ""
             )
         )
     }

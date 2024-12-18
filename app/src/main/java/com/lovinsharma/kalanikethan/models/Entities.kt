@@ -7,6 +7,7 @@ import io.realm.kotlin.types.RealmObject
 import io.realm.kotlin.types.annotations.Index
 import io.realm.kotlin.types.annotations.PrimaryKey
 import org.mongodb.kbson.ObjectId
+import java.math.BigDecimal
 
 //import androidx.room.ColumnInfo
 //import androidx.room.Entity
@@ -26,7 +27,8 @@ class Family: RealmObject {
     var students: RealmList<Student> = realmListOf()
     var parents: RealmList<Parent> = realmListOf()
     var paymentDate: Long = 0L // Next payment deadline
-    var paymentHistory: RealmList<Payment> = realmListOf() // Historical payments
+    var paymentHistory: RealmList<Payment> = realmListOf()
+    var paymentAmount: String = ""
     var paymentID: String = ""
 }
 
@@ -57,7 +59,7 @@ class SignInEvent: RealmObject {
 class Payment: RealmObject {
     @PrimaryKey var _id: ObjectId = ObjectId()
     var paymentDate: Long = 0L // Date of this specific payment
-    var amountPaid: Double = 0.0 // Amount of payment made
+    var amountPaid: String = ""// Amount of payment made
 }
 
 

@@ -1,6 +1,7 @@
 package com.lovinsharma.kalanikethan.screens.addscreen
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,11 +14,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,12 +39,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.lovinsharma.kalanikethan.R
 import com.lovinsharma.kalanikethan.composables.DatePickerModal
 import com.lovinsharma.kalanikethan.models.FamilyUI
 import com.lovinsharma.kalanikethan.models.Parent
@@ -49,6 +56,7 @@ import com.lovinsharma.kalanikethan.models.ParentUI
 import com.lovinsharma.kalanikethan.models.Student
 import com.lovinsharma.kalanikethan.models.StudentUI
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.time.LocalDate
 import java.time.ZoneId
@@ -61,6 +69,7 @@ import java.util.Locale
 fun PaymentIDScreen(family: FamilyUI, familyName: MutableState<String>, parents: MutableList<ParentUI>, students: MutableList<StudentUI>, addState: MutableState<Boolean>, viewModel: MainViewModel) {
     var paymentID by remember { mutableStateOf(family.paymentID) }
     var paymentDate by remember { mutableStateOf(if (family.paymentDate == 0L) "" else SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(Date(family.paymentDate))) }
+    var paymentAmount by remember { mutableStateOf(family.paymentAmount) }
     var paymentEmail by remember { mutableStateOf(family.familyEmail) }
     var showDatePicker by remember { mutableStateOf(false) } // State to control dialog visibility
     var showfloatingdiaglog by remember { mutableStateOf(false) }
@@ -139,26 +148,65 @@ fun PaymentIDScreen(family: FamilyUI, familyName: MutableState<String>, parents:
             }
         }
 
-        OutlinedTextField(
-            value = paymentEmail,
-            onValueChange = { input -> paymentEmail = input },
-            modifier = Modifier
-                .padding(horizontal = 20.dp).width(527.dp),
-            colors = TextFieldDefaults.outlinedTextFieldColors(
-                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
-                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
-            ),
-            placeholder = { Text("Enter payment email") },
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Email,
-                    contentDescription = "Email Icon"
-                )
-            },
-            singleLine = true,
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
 
+            OutlinedTextField(
+                value = paymentEmail,
+                onValueChange = { input -> paymentEmail = input },
+                modifier = Modifier
+                    .padding(horizontal = 20.dp).width(527.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                ),
+                placeholder = { Text("Enter payment email") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.Email,
+                        contentDescription = "Email Icon"
+                    )
+                },
+                singleLine = true,
+
+                )
+
+
+            OutlinedTextField(
+                value = paymentAmount.toString(),
+                onValueChange = { input ->
+                    // Only allow the input if it's a valid number with at most one decimal point
+                    if (input.isEmpty() || input.matches(Regex("\\d*\\.?\\d*"))) {
+                        paymentAmount = input
+                    }
+                },
+                modifier = Modifier
+                    .padding(horizontal = 20.dp)
+                    .width(527.dp),
+                colors = TextFieldDefaults.outlinedTextFieldColors(
+                    containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                    focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                    unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                ),
+                placeholder = { Text("Enter payment amount") },
+                leadingIcon = {
+                    Icon(
+                        Icons.Default.ShoppingCart,
+                        contentDescription = "Pound Icon",
+                    )
+                },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    keyboardType = KeyboardType.Number,  // Adjust keyboard type to number
+                    capitalization = KeyboardCapitalization.Words
+                ),
+                singleLine = true,
             )
+
+
+
+        }
 
         Button(
             onClick = {
@@ -167,7 +215,8 @@ fun PaymentIDScreen(family: FamilyUI, familyName: MutableState<String>, parents:
                     familyName = familyName.value,
                     familyEmail = paymentEmail,
                     paymentDate = if (paymentDate == "") 0L else convertDateToLong(paymentDate),
-                    paymentID = paymentID
+                    paymentID = paymentID,
+                    paymentAmount = paymentAmount.toString()
                 )
 
 
@@ -184,6 +233,7 @@ fun PaymentIDScreen(family: FamilyUI, familyName: MutableState<String>, parents:
                 paymentEmail = ""
                 paymentID = ""
                 paymentDate = ""
+                paymentAmount = ""
                 showfloatingdiaglog = true
             },
             modifier = Modifier.padding(20.dp),

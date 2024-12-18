@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.liveData
+import androidx.room.util.query
 import com.lovinsharma.kalanikethan.models.SignInEvent
 import com.lovinsharma.kalanikethan.screens.getFormattedDay
 import io.realm.kotlin.ext.query
@@ -30,6 +31,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.mongodb.kbson.ObjectId
+import java.util.Calendar
 import java.util.Date
 
 class MainViewModel: ViewModel() {
@@ -58,6 +60,109 @@ class MainViewModel: ViewModel() {
     val signedStudents: StateFlow<List<Student>> get() = _signedStudents
 
 
+    private val _paymentsFlow = MutableStateFlow<List<Family>>(emptyList())
+    val paymentsFlow: StateFlow<List<Family>> get() = _paymentsFlow
+
+    init {
+        // Initialize a listener on the payments query
+        observePayments()
+    }
+
+    private fun observePayments() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val currentTime = System.currentTimeMillis()
+
+                // Query families with due payments
+                val query = realm.query<Family>("paymentDate <= $0", currentTime)
+
+                // Add a listener to the query
+                query.asFlow().collect { result ->
+                    val familiesWithDuePayments = result.list
+                    _paymentsFlow.value = familiesWithDuePayments
+
+                    // Log for debugging
+                    Log.d("observePayments", "Payments updated: ${familiesWithDuePayments.size}")
+                }
+            } catch (e: Exception) {
+                Log.e("observePayments", "Error observing payments", e)
+            }
+        }
+    }
+
+    fun confirmPurchaseButton(familyId: ObjectId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+                // Find the family object by ID
+                val family = query(Family::class, "_id == $0", familyId).first().find()
+
+                if (family != null) {
+                    // Create a Calendar instance from the current paymentDate
+                    val calendar = Calendar.getInstance()
+                    calendar.timeInMillis = family.paymentDate
+
+                    // Add one month to the current date
+                    calendar.add(Calendar.MONTH, 1)
+
+                    // Update the paymentDate in the Realm object
+                    family.paymentDate = calendar.timeInMillis
+                } else {
+                    Log.e("confirmPurchaseButton", "Family not found with ID: $familyId")
+                }
+            }
+        }
+    }
+
+    fun sendReminderButton(familyID: ObjectId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+
+                val family = query(Family::class, "_id == $0", familyID).first().find()
+
+                if (family != null) {
+                    val calendar = Calendar.getInstance()
+                    calendar.timeInMillis = family.paymentDate
+
+                    calendar.add(Calendar.DAY_OF_MONTH, 3)
+
+                    family.paymentDate = calendar.timeInMillis
+                }
+
+
+            }
+
+
+
+        }
+    }
+
+    fun IncorrectAmountPaidButton(familyID: ObjectId) {
+        viewModelScope.launch(Dispatchers.IO) {
+            realm.write {
+
+                val family = query(Family::class, "_id == $0", familyID).first().find()
+
+                if (family != null) {
+                    val calendar = Calendar.getInstance()
+                    calendar.timeInMillis = family.paymentDate
+
+                    calendar.add(Calendar.DAY_OF_MONTH, 3)
+
+                    family.paymentDate = calendar.timeInMillis
+                }
+
+
+            }
+
+
+
+        }
+    }
+
+
+
+
+
     private fun createFamily(
         family: FamilyUI,
         parents: List<ParentUI>,
@@ -75,6 +180,7 @@ class MainViewModel: ViewModel() {
                     familyEmail = family.familyEmail
                     paymentDate = family.paymentDate
                     paymentID = family.paymentID
+                    paymentAmount = family.paymentAmount.toString()
                 }
 
                 // Add parents to the family
@@ -204,6 +310,7 @@ class MainViewModel: ViewModel() {
                     family.familyEmail = updatedFamily.familyEmail
                     family.paymentDate = updatedFamily.paymentDate
                     family.paymentID = updatedFamily.paymentID
+                    family.paymentAmount = updatedFamily.paymentAmount
                 }
 
                 // Step 2: Get the list of updated students, excluding students with null IDs
@@ -306,6 +413,8 @@ class MainViewModel: ViewModel() {
 
 
 
+
+
     // Fetches all families along with related students, parents, and payments as a Flow
     fun getAllFamilies(): Flow<List<Family>> = flow {
         // Query to fetch all families (includes students, parents, and payments)
@@ -378,6 +487,7 @@ class MainViewModel: ViewModel() {
 
         // Clear the UI data after saving
         familyName.value = ""
+
         parents.clear()
         students.clear()
         addState.value = true

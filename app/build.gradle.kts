@@ -87,6 +87,8 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    implementation("com.sun.mail:android-mail:1.6.0")
+    implementation("com.sun.mail:android-activation:1.6.0")
     implementation("com.google.accompanist:accompanist-flowlayout:0.24.10-beta") // Make sure to use the latest version
     implementation("io.realm.kotlin:library-base:2.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0")

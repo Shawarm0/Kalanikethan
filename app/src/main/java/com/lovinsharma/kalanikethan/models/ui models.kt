@@ -1,11 +1,13 @@
 package com.lovinsharma.kalanikethan.models
 
 import org.mongodb.kbson.ObjectId
+import java.math.BigDecimal
 
 data class FamilyUI (
     var familyName: String,
     var familyEmail: String,
     var paymentDate: Long,
+    var paymentAmount: String,
     var paymentID: String,
 )
 

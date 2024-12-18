@@ -28,6 +28,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -189,6 +190,7 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                     familyEmail = family.familyEmail ?: "",
                     paymentDate = family.paymentDate,
                     paymentID = family.paymentID,
+                    paymentAmount = family.paymentAmount
                 )
             )
         }
@@ -356,6 +358,36 @@ fun EditFamily(viewModel: MainViewModel, familyID: MutableState<ObjectId>, navco
                             },
                             readOnly = true, // Make field read-only so users can only select a date
                             singleLine = true
+                        )
+
+                        OutlinedTextField(
+                            value = familyui.value.paymentAmount,
+                            onValueChange = { input ->
+                                // Only allow the input if it's a valid number with at most one decimal point
+                                if (input.isEmpty() || input.matches(Regex("\\d*\\.?\\d*"))) {
+                                    familyui.value = familyui.value.copy(paymentAmount = input)
+                                }
+                            },
+                            modifier = Modifier.weight(1f),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                containerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.Transparent,
+                                focusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                                unfocusedTextColor = if (isSystemInDarkTheme()) Color.White else Color.Black,
+                            ),
+                            placeholder = { Text("Enter payment amount") },
+
+                            label = { Text("Payment Amounty") },
+                            leadingIcon = {
+                                Icon(
+                                    Icons.Default.ShoppingCart,
+                                    contentDescription = "Pound Icon",
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions.Default.copy(
+                                keyboardType = KeyboardType.Number,  // Adjust keyboard type to number
+                                capitalization = KeyboardCapitalization.Words
+                            ),
+                            singleLine = true,
                         )
 
 
