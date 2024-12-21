@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -18,7 +19,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -30,9 +33,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.lovinsharma.kalanikethan.composables.StudentBox
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
+import java.util.Locale
 
 @Composable
-fun WhoInScreen(navController: NavController) {
+fun WhoInScreen(viewModel: MainViewModel) {
 
 
 
@@ -41,8 +45,9 @@ fun WhoInScreen(navController: NavController) {
             .fillMaxSize(),
         verticalArrangement = Arrangement.Top,
     ) {
-        val viewModel: MainViewModel = viewModel()
         val students by viewModel.signedStudents.collectAsState()
+        var query by remember { mutableStateOf("") }
+
         // This creates the box at the top of the screen
         Box(
             modifier = Modifier
@@ -52,15 +57,41 @@ fun WhoInScreen(navController: NavController) {
                 .padding(horizontal = 30.dp),
             contentAlignment = Alignment.CenterStart
         ) {
-            Text(
-                text = "Who's In",
-                color = Color.White,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier
-                    .wrapContentHeight(align = Alignment.CenterVertically),
-                textAlign = TextAlign.Right
-            )
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Who's In",
+                    color = Color.White,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .wrapContentHeight(align = Alignment.CenterVertically),
+                    textAlign = TextAlign.Right
+                )
+
+
+                SearchBar2(
+                    query = query,
+                    onQueryChanged = { input ->
+                        query = input.split(" ")
+                            .joinToString(" ") {
+                                it.replaceFirstChar { char ->
+                                    if (char.isLowerCase()) char.titlecase(Locale.ROOT) else char.toString()
+                                }
+                            }
+                        viewModel.updateSignedInQuery(query)
+                    },
+                    onClear = {
+                        query = ""
+                        viewModel.updateSignedInQuery("")
+                    }
+                )
+
+            }
         }
 
 

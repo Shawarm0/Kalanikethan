@@ -47,9 +47,10 @@ import com.lovinsharma.kalanikethan.models.Family
 import com.lovinsharma.kalanikethan.screens.addscreen.AddScreen
 import com.lovinsharma.kalanikethan.screens.HistoryScreen
 import com.lovinsharma.kalanikethan.screens.homescreen.HomeScreen
-import com.lovinsharma.kalanikethan.screens.PaymentsScreen
+import com.lovinsharma.kalanikethan.screens.payments.PaymentsScreen
 import com.lovinsharma.kalanikethan.screens.SignInScreen
 import com.lovinsharma.kalanikethan.screens.WhoInScreen
+import com.lovinsharma.kalanikethan.screens.payments.PaymentHistory
 import com.lovinsharma.kalanikethan.ui.theme.KalanikethanTheme
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 
@@ -105,9 +106,11 @@ class MainActivity : ComponentActivity() {
                                 composable("Home") { HomeScreen(viewModel) }
                                 composable("SignIn") { SignInScreen(viewModel) }
                                 composable("AddScreen") { AddScreen(viewModel) }
-                                composable("WhoInScreen") { WhoInScreen(navController) }
+                                composable("WhoInScreen") { WhoInScreen(viewModel) }
                                 composable("History") { HistoryScreen(viewModel) }
-                                composable("PaymentsScreen") { PaymentsScreen(viewModel) } }
+                                composable("PaymentsScreen") { PaymentsScreen(viewModel, navController) }
+                                composable("PaymentHistory") { PaymentHistory(viewModel) }}
+
                         }
                     }
                 }

@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import androidx.lifecycle.liveData
 import androidx.room.util.query
+import com.lovinsharma.kalanikethan.models.Payment
 import com.lovinsharma.kalanikethan.models.SignInEvent
 import com.lovinsharma.kalanikethan.screens.getFormattedDay
 import io.realm.kotlin.ext.query
@@ -106,12 +107,22 @@ class MainViewModel: ViewModel() {
 
                     // Update the paymentDate in the Realm object
                     family.paymentDate = calendar.timeInMillis
+
+                    // Create a new Payment object
+                    val newPayment = Payment().apply {
+                        paymentDate = System.currentTimeMillis() // Current date as the payment date
+                        amountPaid = family.paymentAmount // Use the family's payment amount
+                    }
+
+                    // Append the new Payment to the family's paymentHistory
+                    family.paymentHistory.add(newPayment)
                 } else {
                     Log.e("confirmPurchaseButton", "Family not found with ID: $familyId")
                 }
             }
         }
     }
+
 
     fun sendReminderButton(familyID: ObjectId) {
         viewModelScope.launch(Dispatchers.IO) {
@@ -426,25 +437,46 @@ class MainViewModel: ViewModel() {
 
 
     init {
-        fetchUnsignedStudents()
-        fetchSignedStudents() // Also fetch signed-in students
+        fetchUnsignedStudents("") // Initially fetch all unsigned students
+        fetchSignedStudents("")   // Initially fetch all signed-in students
     }
 
     // Fetch all unsigned students and update the StateFlow
-    private fun fetchUnsignedStudents() {
+    private fun fetchUnsignedStudents(query: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
-            val students = realm.query<Student>("signedIn == false").find()
+            val condition = if (query.isEmpty()) {
+                "signedIn == false"
+            } else {
+                "signedIn == false AND studentName LIKE $0"
+            }
+            val students = realm.query<Student>(condition, if (query.isEmpty()) null else "*${query}*").find()
             _unsignedStudents.value = students.toList() // Update the state
         }
     }
 
+    // Update the search query for unsigned students and fetch relevant data
+    fun updateUnsignedInQuery(query: String) {
+        fetchUnsignedStudents(query)
+    }
+
     // Fetch all signed-in students and update the StateFlow
-    private fun fetchSignedStudents() {
+    private fun fetchSignedStudents(query: String = "") {
         viewModelScope.launch(Dispatchers.IO) {
-            val students = realm.query<Student>("signedIn == true").find()
+            val condition = if (query.isEmpty()) {
+                "signedIn == true"
+            } else {
+                "signedIn == true AND studentName LIKE $0"
+            }
+            val students = realm.query<Student>(condition, if (query.isEmpty()) null else "*${query}*").find()
             _signedStudents.value = students.toList() // Update the state
         }
     }
+
+    // Update the search query for signed-in students and fetch relevant data
+    fun updateSignedInQuery(query: String) {
+        fetchSignedStudents(query)
+    }
+
 
 
     // Sign the student in
@@ -454,8 +486,11 @@ class MainViewModel: ViewModel() {
                 val studentToUpdate = findLatest(student)
                 studentToUpdate?.signedIn = true
             }
-            fetchUnsignedStudents() // Refresh the list after sign-in
+            // Refresh both StateFlows
+            fetchUnsignedStudents()
+            fetchSignedStudents()
         }
+
     }
     // Sign the student out
     fun signOut(student: Student) {
@@ -464,7 +499,9 @@ class MainViewModel: ViewModel() {
                 val studentToUpdate = findLatest(student)
                 studentToUpdate?.signedIn = false
             }
-            fetchSignedStudents() // Refresh the list after sign-out
+            // Refresh both StateFlows
+            fetchUnsignedStudents()
+            fetchSignedStudents()
         }
     }
 

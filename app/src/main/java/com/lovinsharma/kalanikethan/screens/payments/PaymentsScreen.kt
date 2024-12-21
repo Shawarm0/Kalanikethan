@@ -1,4 +1,4 @@
-package com.lovinsharma.kalanikethan.screens
+package com.lovinsharma.kalanikethan.screens.payments
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +22,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.os.AsyncTask
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -41,11 +43,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.navigation.NavHostController
 import com.lovinsharma.kalanikethan.composables.Confirmpayment
 import com.lovinsharma.kalanikethan.composables.IncorrectPayment
 import com.lovinsharma.kalanikethan.models.Family
 import com.lovinsharma.kalanikethan.viewmodel.MainViewModel
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.mail.Authenticator
 import javax.mail.Message
@@ -87,15 +92,40 @@ fun sendEmail(senderEmail: String, senderPassword: String, recipientEmail: Strin
     }
 }
 
+fun formatPaymentDateWithNextMonth(familyPaymentDate: Long): String {
+    val calendar = Calendar.getInstance()
+    calendar.timeInMillis = familyPaymentDate
+    // Add 1 to the month (months are 0-indexed in Calendar)
+    calendar.add(Calendar.MONTH, 1)
+
+    val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+    return formatter.format(calendar.time)
+}
 
 
 // Add and change these
-fun sendGoodEmail(family: Family) {
+@RequiresApi(Build.VERSION_CODES.O)
+fun sendConfirmEmail(family: Family) {
     val senderEmail = "loving.shawarma@gmail.com"
     val senderPassword = "" // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
-    val subject = "Test Email"
-    val body = "Hello, this is a test email sent from Jetpack Compose. The good email"
+    val subject = "Payment Confirmation for Kalanikethan"
+    val body =  """
+    Hello,
+    
+    We’re pleased to confirm that we have received your payment for Kalanikethan.
+
+    Details of Your Payment:
+    - Payment Amount: £${family.paymentAmount}
+    - Payment ID: ${family.paymentID}
+    - Confirmation Date: ${LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))}
+    - Next Payment Due Date: ${formatPaymentDateWithNextMonth(family.paymentDate)}
+
+    Your payment history has been updated in our records. If you have any questions or concerns about your payment, feel free to reply to this email!
+
+    Best regards,
+    Kalanikethan CIC
+""".trimIndent()
 
 
     if (recipientEmail != null) {
@@ -105,12 +135,53 @@ fun sendGoodEmail(family: Family) {
 }
 
 
-fun sendBadEmail(family: Family) {
+fun sendReminderEmail(family: Family) {
     val senderEmail = "loving.shawarma@gmail.com"
     val senderPassword = "" // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
-    val subject = "Test Email"
-    val body = "Hello, this is a test email sent from Jetpack Compose. The bad email"
+    val subject = "Payment Reminder for Kalanikethan"
+    val body =  """
+    Hello,
+    
+    We would like to inform you that we have not yet recieved your payment for Kalanikethan.
+
+    Details of Your Payment:
+    - Payment Amount: £${family.paymentAmount}
+    - PaymentID: ${family.paymentID}
+    - Payment Date: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(family.paymentDate)}
+
+    Please ensure that you pay this as soon as possible. If you have any questions or concerns about your payment, feel free to reply to this email!
+
+    Best regards,
+    Kalanikethan CIC
+""".trimIndent()
+
+    if (recipientEmail != null) {
+        sendEmail(senderEmail, senderPassword, recipientEmail, subject, body)
+    }
+}
+
+fun sendIncorrectEmail(family: Family, inputAmount: String) {
+    val senderEmail = "loving.shawarma@gmail.com"
+    val senderPassword = "" // Use App Password or OAuth for security
+    val recipientEmail = family.familyEmail
+    val subject = "Payment Reminder for Kalanikethan"
+    val body =  """
+    Hello,
+    
+    We would like to inform you that we recieved the incorrect amount for your payment regarding Kalanikethan.
+
+    Details of Your Payment:
+    - Payment Amount: £${family.paymentAmount}
+    - Payment Recieved £${inputAmount}
+    - PaymentID: ${family.paymentID}
+    - Payment Date: ${SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).format(family.paymentDate)}
+
+    Please ensure that you pay the remaining amount as soon as possible. If you have any questions or concerns about your payment, feel free to reply to this email!
+
+    Best regards,
+    Kalanikethan CIC
+""".trimIndent()
 
     if (recipientEmail != null) {
         sendEmail(senderEmail, senderPassword, recipientEmail, subject, body)
@@ -119,8 +190,9 @@ fun sendBadEmail(family: Family) {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun PaymentsScreen(viewModel: MainViewModel) {
+fun PaymentsScreen(viewModel: MainViewModel, navController: NavHostController) {
     val familiesWithDuePayments = viewModel.paymentsFlow.collectAsState(initial = emptyList())
 
     Column(
@@ -164,6 +236,7 @@ fun PaymentsScreen(viewModel: MainViewModel) {
 
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun FamilyBox2(family: Family, viewModel: MainViewModel) {
@@ -219,26 +292,26 @@ fun FamilyBox2(family: Family, viewModel: MainViewModel) {
                 color = textColor
             )
 
-            // Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // View History Button with a fixed width
-                Button(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth(), // Fixed width for View History button
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(
-                        text = "View History",
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.White
-                    )
-                }
-            }
+//            // Action Buttons
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                // View History Button with a fixed width
+//                Button(
+//                    onClick = { },
+//                    modifier = Modifier.fillMaxWidth(), // Fixed width for View History button
+//                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+//                    shape = MaterialTheme.shapes.medium
+//                ) {
+//                    Text(
+//                        text = "View History",
+//                        fontSize = 16.sp,
+//                        textAlign = TextAlign.Center,
+//                        color = Color.White
+//                    )
+//                }
+//            }
 
             // Buttons for Confirm Payment, Send Reminder, and Incorrect Payment
             Row(
@@ -300,7 +373,7 @@ fun FamilyBox2(family: Family, viewModel: MainViewModel) {
                     onDismissRequest = {confirmpayment = false},
                     onConfirmation = {
                                         viewModel.confirmPurchaseButton(family._id)
-                                        sendGoodEmail(family)
+                                        sendConfirmEmail(family)
                                         confirmpayment = false},
                     dialogTitle = "Confirm Payment",
                     dialogText = "Are you sure you want to confirm this payment?\n" +
@@ -315,7 +388,7 @@ fun FamilyBox2(family: Family, viewModel: MainViewModel) {
                     onDismissRequest = {sendReminder = false},
                     onConfirmation = {
                         viewModel.sendReminderButton(family._id)
-                        sendBadEmail(family)
+                        sendReminderEmail(family)
                         sendReminder = false
 
                     },
@@ -329,8 +402,9 @@ fun FamilyBox2(family: Family, viewModel: MainViewModel) {
             if (incorrectAmountPaid)  {
                 IncorrectPayment(
                     onDismissRequest = {incorrectAmountPaid = false},
-                    onConfirmation = {
+                    onConfirmation = { inputamount ->
                         viewModel.IncorrectAmountPaidButton(family._id)
+                        sendIncorrectEmail(family, inputamount)
                         incorrectAmountPaid = false
                     },
                     dialogTitle = "Incorrect Amount Paid",

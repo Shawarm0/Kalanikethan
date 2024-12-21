@@ -35,6 +35,9 @@ fun ParentsScreen(parents: MutableList<ParentUI>, familyName: String) {
                     parent = parents[index],
                     onParentChange = { updatedParent ->
                         parents[index] = updatedParent
+                    },
+                    onParentRemove = {
+                        parents.remove(it)
                     }
                 )
             }

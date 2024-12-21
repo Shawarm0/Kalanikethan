@@ -51,7 +51,7 @@ fun DatePickerModal(
                 selectedDayContentColor = Color.White,
                 selectedDayContainerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
                 selectedYearContainerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.tertiary else MaterialTheme.colorScheme.primary,
-                dateTextFieldColors = if (isSystemInDarkTheme()) TextFieldDefaults.textFieldColors(focusedTextColor = Color.White, unfocusedLabelColor = Color.White, focusedLabelColor = Color.White) else TextFieldDefaults.textFieldColors(focusedTextColor = Color.Black),
+                dateTextFieldColors = if (isSystemInDarkTheme()) TextFieldDefaults.textFieldColors(focusedTextColor = Color.White, unfocusedLabelColor = Color.White, focusedLabelColor = Color.White, unfocusedIndicatorColor = Color.Black) else TextFieldDefaults.textFieldColors(focusedTextColor = Color.Black, unfocusedTextColor = Color.Black),
             )
         )
     }
