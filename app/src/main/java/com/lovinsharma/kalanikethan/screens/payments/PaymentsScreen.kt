@@ -1,4 +1,4 @@
-package com.lovinsharma.kalanikethan.screens
+package com.lovinsharma.kalanikethan.screens.payments
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -41,6 +41,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.clip
+import androidx.navigation.NavHostController
 import com.lovinsharma.kalanikethan.composables.Confirmpayment
 import com.lovinsharma.kalanikethan.composables.IncorrectPayment
 import com.lovinsharma.kalanikethan.models.Family
@@ -92,7 +93,7 @@ fun sendEmail(senderEmail: String, senderPassword: String, recipientEmail: Strin
 // Add and change these
 fun sendGoodEmail(family: Family) {
     val senderEmail = "loving.shawarma@gmail.com"
-    val senderPassword = "" // Use App Password or OAuth for security
+    val senderPassword = "rtmj nave gzag wnyl " // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
     val subject = "Test Email"
     val body = "Hello, this is a test email sent from Jetpack Compose. The good email"
@@ -107,7 +108,7 @@ fun sendGoodEmail(family: Family) {
 
 fun sendBadEmail(family: Family) {
     val senderEmail = "loving.shawarma@gmail.com"
-    val senderPassword = "" // Use App Password or OAuth for security
+    val senderPassword = "rtmj nave gzag wnyl " // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
     val subject = "Test Email"
     val body = "Hello, this is a test email sent from Jetpack Compose. The bad email"
@@ -120,7 +121,7 @@ fun sendBadEmail(family: Family) {
 
 
 @Composable
-fun PaymentsScreen(viewModel: MainViewModel) {
+fun PaymentsScreen(viewModel: MainViewModel, navController: NavHostController) {
     val familiesWithDuePayments = viewModel.paymentsFlow.collectAsState(initial = emptyList())
 
     Column(
@@ -219,26 +220,26 @@ fun FamilyBox2(family: Family, viewModel: MainViewModel) {
                 color = textColor
             )
 
-            // Action Buttons
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // View History Button with a fixed width
-                Button(
-                    onClick = { },
-                    modifier = Modifier.fillMaxWidth(), // Fixed width for View History button
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Text(
-                        text = "View History",
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        color = Color.White
-                    )
-                }
-            }
+//            // Action Buttons
+//            Row(
+//                modifier = Modifier.fillMaxWidth(),
+//                horizontalArrangement = Arrangement.spacedBy(12.dp)
+//            ) {
+//                // View History Button with a fixed width
+//                Button(
+//                    onClick = { },
+//                    modifier = Modifier.fillMaxWidth(), // Fixed width for View History button
+//                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+//                    shape = MaterialTheme.shapes.medium
+//                ) {
+//                    Text(
+//                        text = "View History",
+//                        fontSize = 16.sp,
+//                        textAlign = TextAlign.Center,
+//                        color = Color.White
+//                    )
+//                }
+//            }
 
             // Buttons for Confirm Payment, Send Reminder, and Incorrect Payment
             Row(
