@@ -224,7 +224,7 @@ fun Appbar(
                 isSelected = selectedScreen == "whosin",
                 onClick = {
                     selectedScreen = "whosin"
-                    viewModel.updateUnsignedInQuery("")
+                    viewModel.updateSignedInQuery("")
                     onScreenSelected("WhoInScreen")
                 }
             )
