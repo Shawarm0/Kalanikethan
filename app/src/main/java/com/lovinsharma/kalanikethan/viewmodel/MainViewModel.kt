@@ -486,9 +486,6 @@ class MainViewModel: ViewModel() {
                 val studentToUpdate = findLatest(student)
                 studentToUpdate?.signedIn = true
             }
-            // Refresh both StateFlows
-            fetchUnsignedStudents()
-            fetchSignedStudents()
         }
 
     }
@@ -499,9 +496,6 @@ class MainViewModel: ViewModel() {
                 val studentToUpdate = findLatest(student)
                 studentToUpdate?.signedIn = false
             }
-            // Refresh both StateFlows
-            fetchUnsignedStudents()
-            fetchSignedStudents()
         }
     }
 

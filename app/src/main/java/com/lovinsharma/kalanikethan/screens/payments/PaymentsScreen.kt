@@ -106,8 +106,8 @@ fun formatPaymentDateWithNextMonth(familyPaymentDate: Long): String {
 // Add and change these
 @RequiresApi(Build.VERSION_CODES.O)
 fun sendConfirmEmail(family: Family) {
-    val senderEmail = "loving.shawarma@gmail.com"
-    val senderPassword = "" // Use App Password or OAuth for security
+    val senderEmail = "kalanikethansunderlandcic@gmail.com"
+    val senderPassword = "npyc wybv bzpw asfr " // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
     val subject = "Payment Confirmation for Kalanikethan"
     val body =  """
@@ -136,8 +136,8 @@ fun sendConfirmEmail(family: Family) {
 
 
 fun sendReminderEmail(family: Family) {
-    val senderEmail = "loving.shawarma@gmail.com"
-    val senderPassword = "" // Use App Password or OAuth for security
+    val senderEmail = "kalanikethansunderlandcic@gmail.com"
+    val senderPassword = "npyc wybv bzpw asfr " // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
     val subject = "Payment Reminder for Kalanikethan"
     val body =  """
@@ -162,10 +162,10 @@ fun sendReminderEmail(family: Family) {
 }
 
 fun sendIncorrectEmail(family: Family, inputAmount: String) {
-    val senderEmail = "loving.shawarma@gmail.com"
-    val senderPassword = "" // Use App Password or OAuth for security
+    val senderEmail = "kalanikethansunderlandcic@gmail.com"
+    val senderPassword = "npyc wybv bzpw asfr " // Use App Password or OAuth for security
     val recipientEmail = family.familyEmail
-    val subject = "Payment Reminder for Kalanikethan"
+    val subject = "Incorrect payment for Kalanikethan"
     val body =  """
     Hello,
     

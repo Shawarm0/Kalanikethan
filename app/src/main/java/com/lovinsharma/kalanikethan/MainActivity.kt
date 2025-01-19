@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
                                 .padding(innerPadding)
                                 .width(200.dp)
                                 .fillMaxHeight(),
+                            viewModel = viewModel,
                             onScreenSelected = { screen ->
                                 if (navController.currentBackStackEntry?.destination?.route!=screen) {
                                     navController.navigate(screen, navOptions = navOptions)
@@ -145,6 +146,7 @@ fun CustomIcon(
 @Composable
 fun Appbar(
     modifier: Modifier = Modifier,
+    viewModel: MainViewModel,
     onScreenSelected: (String) -> Unit
 ) {
     Surface(
@@ -199,6 +201,7 @@ fun Appbar(
                 isSelected = selectedScreen == "signin",
                 onClick = {
                     selectedScreen = "signin"
+                    viewModel.updateUnsignedInQuery("")
                     onScreenSelected("SignIn")
                 }
             )
@@ -221,6 +224,7 @@ fun Appbar(
                 isSelected = selectedScreen == "whosin",
                 onClick = {
                     selectedScreen = "whosin"
+                    viewModel.updateUnsignedInQuery("")
                     onScreenSelected("WhoInScreen")
                 }
             )

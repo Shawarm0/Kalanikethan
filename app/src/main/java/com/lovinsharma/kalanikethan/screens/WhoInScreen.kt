@@ -39,7 +39,6 @@ import java.util.Locale
 fun WhoInScreen(viewModel: MainViewModel) {
 
 
-
     Column(
         modifier = Modifier
             .fillMaxSize(),
